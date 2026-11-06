@@ -11,7 +11,6 @@ import { selectSharedSettings } from '../../global/selectors/sharedState';
 import buildClassName from '../../util/buildClassName';
 import { loadAndChangeLanguage } from '../../util/localization';
 import { createStyledQrCode } from '../../util/qrCode/buildStyledQrCode';
-import { LOCAL_TGS_URLS } from '../common/helpers/animatedAssets';
 import { navigateBack } from './helpers/backNavigation';
 import { getSuggestedLanguage } from './helpers/getSuggestedLanguage';
 
@@ -23,7 +22,6 @@ import useLastCallback from '../../hooks/useLastCallback';
 import useMediaTransitionDeprecated from '../../hooks/useMediaTransitionDeprecated';
 import useMultiaccountInfo from '../../hooks/useMultiaccountInfo';
 
-import AnimatedIcon from '../common/AnimatedIcon';
 import Button from '../ui/Button';
 import Loading from '../ui/Loading';
 
@@ -33,6 +31,7 @@ type StateProps = {
   language?: string;
 };
 
+import appLogoUrl from '../../assets/telegram-logo.svg';
 const DATA_PREFIX = 'tg://login?token=';
 const QR_SIZE = 280;
 const QR_PLANE_SIZE = 54;
@@ -157,12 +156,13 @@ const AuthCode = ({
               ref={qrCodeRef}
               style={`width: ${QR_SIZE}px; height: ${QR_SIZE}px`}
             />
-            <AnimatedIcon
-              tgsUrl={LOCAL_TGS_URLS.QrPlane}
-              size={QR_PLANE_SIZE}
+            <img
+              src={appLogoUrl}
+              width={QR_PLANE_SIZE}
+              height={QR_PLANE_SIZE}
               className="qr-plane"
-              nonInteractive
-              noLoop={false}
+              alt=""
+              draggable={false}
             />
           </div>
           {!isQrMounted && <div className="qr-loading"><Loading /></div>}

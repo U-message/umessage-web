@@ -81,7 +81,7 @@ export const SHARED_STATE_CACHE_VERSION = 2;
 export const INITIAL_SHARED_STATE: SharedState = {
   cacheVersion: SHARED_STATE_CACHE_VERSION,
   settings: {
-    theme: 'light',
+    theme: 'dark',
     themes: {
       light: {
         isBlurred: true,
@@ -92,7 +92,7 @@ export const INITIAL_SHARED_STATE: SharedState = {
         patternColor: getDefaultPatternColor('dark'),
       },
     },
-    shouldUseSystemTheme: true,
+    shouldUseSystemTheme: false,
     messageTextSize: IS_IOS
       ? IOS_DEFAULT_MESSAGE_TEXT_SIZE_PX
       : (IS_MAC_OS ? MACOS_DEFAULT_MESSAGE_TEXT_SIZE_PX : DEFAULT_MESSAGE_TEXT_SIZE_PX),

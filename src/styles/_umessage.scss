@@ -1,0 +1,36 @@
+// U message look on top of Web A: solid black, monochrome ink, Unbounded for screen titles
+@font-face {
+  font-family: "Unbounded";
+  font-weight: 700;
+
+  font-display: swap;
+  src: url("../assets/fonts/Unbounded-Bold.ttf") format("truetype");
+}
+
+// In the dark theme the accent is near-white, so anything drawn on an accent fill needs dark ink
+.theme-dark {
+  .Button.primary {
+    --button-text-color: #000000;
+
+    color: #000000;
+  }
+}
+
+#auth-qr-form,
+#auth-phone-number-form,
+#auth-code-form,
+#auth-password-form,
+#auth-registration-form {
+  h1 {
+    font-family: "Unbounded", var(--font-family);
+    font-weight: 700;
+  }
+}
+
+.theme-dark #auth-qr-form,
+.theme-dark #auth-phone-number-form,
+.theme-dark #auth-code-form,
+.theme-dark #auth-password-form,
+.theme-dark #auth-registration-form {
+  background: #000000;
+}
