@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /$
+Disallow: /get/
+Disallow: /share/
+
+Sitemap: https://u-message.org/sitemap.xml

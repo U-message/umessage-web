@@ -12,7 +12,7 @@ case "$1" in
 esac
 
 if [ "$1" = dev ]; then
-  cd "$ROOT" && npm run build:production
+  cd "$ROOT" && BASE_URL=https://web.u-message.org/ npm run build:production
   rm -rf "$OUT" && mkdir -p "$OUT"
   rsync -a --exclude '*.map' --exclude build-stats.json "$ROOT/dist/" "$OUT/"
 elif [ ! -f "$OUT/index.html" ]; then

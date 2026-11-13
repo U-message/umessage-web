@@ -1,7 +1,7 @@
 {
     "name": "U message",
     "short_name": "U message",
-    "description": "U message: Tez. Xavfsiz. O‘zimizniki. Unofficial client built on the Telegram API.",
+    "description": "U message: Tez. Xavfsiz. O‘zimizniki. Telegram mijozi.",
     "start_url": "./",
     "gcm_sender_id": "122867383838",
     "icons": [
