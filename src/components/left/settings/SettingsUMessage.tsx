@@ -126,6 +126,13 @@ const SettingsUMessage = ({
       <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('UMessageSectionProtection')}</IslandTitle>
       <Island>
         <ListItem
+          icon="eye-crossed-outline"
+          narrow
+          onClick={() => openSettingsScreen({ screen: SettingsScreens.UMessagePrivacyGuard })}
+        >
+          <span className="title">{lang('PrivacyGuard')}</span>
+        </ListItem>
+        <ListItem
           icon="eye-crossed"
           narrow
           onClick={() => openSettingsScreen({ screen: SettingsScreens.UMessageHiddenChats })}

@@ -67,3 +67,21 @@ export function selectIsUMessageFocusActiveNow<T extends GlobalState>(global: T,
     ? minutes >= umFocusStart && minutes < umFocusEnd
     : minutes >= umFocusStart || minutes < umFocusEnd;
 }
+
+// Privacy Guard settings with the Android defaults filled in
+export function selectUMessagePrivacyGuard<T extends GlobalState>(global: T) {
+  const {
+    umPgEnabled, umPgMode, umPgAction, umPgSensitivity, umPgHideOwnerAway, umPgProtectMedia, umPgProtectComposer,
+    umPgPasscode,
+  } = selectSettingsKeys(global);
+  return {
+    isEnabled: Boolean(umPgEnabled),
+    mode: umPgMode || 'looking',
+    action: umPgAction || 'blur',
+    sensitivity: umPgSensitivity ?? 1,
+    shouldHideWhenOwnerAway: umPgHideOwnerAway ?? true,
+    shouldProtectMedia: umPgProtectMedia ?? true,
+    shouldProtectComposer: umPgProtectComposer ?? true,
+    passcode: umPgPasscode,
+  };
+}

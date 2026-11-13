@@ -67,3 +67,50 @@
   --color-message-reaction-chosen-hover: #D4D4D6;
   --color-voice-transcribe-button-own: #3A3A3D;
 }
+
+// Ink theme for what used to keep Telegram colours: settings icon tiles, document icons, audio and file accents,
+// text selection and story rings. Account colours (avatars, names) stay Telegram's own.
+:root {
+  --um-icon-tile: #111111;
+  --um-icon-tile-premium: none;
+}
+
+.theme-dark {
+  --um-icon-tile: #3A3A3D;
+}
+
+.File .file-progress,
+.File .file-icon {
+  &.red,
+  &.orange,
+  &.green {
+    background-color: #636366;
+  }
+}
+
+html.theme-light,
+html.theme-dark {
+  --color-text-green: var(--color-primary);
+  --color-selection-highlight: rgb(142 142 147 / 0.35);
+  --color-avatar-story-unread-from: var(--color-primary);
+  --color-avatar-story-unread-to: var(--color-primary);
+  --color-avatar-story-friend-unread-from: var(--color-text-secondary);
+  --color-avatar-story-friend-unread-to: var(--color-text-secondary);
+}
+
+// Saved Messages, Replies and anonymous forwards keep Telegram's blue with a white icon, like account colours
+.Avatar,
+.ProfilePhoto {
+  &.saved-messages,
+  &.replies-bot-account,
+  &.anonymous-forwards {
+    --color-user: #3390ec;
+
+    color: #ffffff;
+  }
+}
+
+// The chat fills the middle column instead of a centred 47.5rem strip that left a gap next to the chat list
+:root {
+  --messages-container-width: 100%;
+}

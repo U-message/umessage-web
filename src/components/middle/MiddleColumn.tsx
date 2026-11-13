@@ -98,6 +98,7 @@ import MiddleHeader from './MiddleHeader';
 import MiddleHeaderPanesIsland from './MiddleHeaderPanesIsland';
 import AudioPlayer from './panes/AudioPlayer';
 import PremiumRequiredPlaceholder from './PremiumRequiredPlaceholder';
+import PrivacyGuardShield from './privacyGuard/PrivacyGuardShield';
 import ReactorListModal from './ReactorListModal.async';
 import MiddleSearch from './search/MiddleSearch.async';
 
@@ -589,6 +590,7 @@ function MiddleColumn({
         />
       )}
       <div id="middle-column-portals" />
+      <PrivacyGuardShield />
       <AudioPlayer
         isIsland
         isHidden={hasActiveMiddleSearch || isRichInputExpanded || (isTablet && isLeftColumnShown)}

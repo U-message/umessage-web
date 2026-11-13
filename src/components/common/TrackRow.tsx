@@ -745,10 +745,11 @@ function useWaveformCanvas(
       return;
     }
 
-    const fillColor = theme === 'dark' ? '#494A78' : '#ADD3F7';
-    const fillOwnColor = theme === 'dark' ? '#B7ABED' : '#AEDFA4';
-    const progressFillColor = theme === 'dark' ? '#8774E1' : '#3390EC';
-    const progressFillOwnColor = theme === 'dark' ? '#FFFFFF' : '#4FAE4E';
+    // U message ink theme instead of Telegram's blue/purple/green
+    const fillColor = theme === 'dark' ? '#48484C' : '#C7C7CC';
+    const fillOwnColor = theme === 'dark' ? '#5C5C61' : '#AEAEB2';
+    const progressFillColor = theme === 'dark' ? '#EDEDED' : '#111111';
+    const progressFillOwnColor = theme === 'dark' ? '#FFFFFF' : '#111111';
 
     const fillStyle = isOwn ? fillOwnColor : fillColor;
     const progressFillStyle = isOwn ? progressFillOwnColor : progressFillColor;

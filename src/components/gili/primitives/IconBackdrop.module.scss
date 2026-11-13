@@ -12,7 +12,8 @@
     height: var(--icon-backdrop-size, 1.875rem);
     border-radius: var(--icon-backdrop-radius, 0.625rem);
 
-    background-color: var(--color-icon-backdrop);
+    // U message: every tile is ink-coloured (see --um-icon-tile in styles/_umessage.scss)
+    background-color: var(--um-icon-tile, var(--color-icon-backdrop));
 
     &::after {
       pointer-events: none;
@@ -62,7 +63,7 @@
   .premium {
     --color-icon-backdrop: #7e57c2;
 
-    background-image: linear-gradient(45deg, #6b93ff 0%, #976fff 43.906%, #e46ace 100%);
+    background-image: var(--um-icon-tile-premium, linear-gradient(45deg, #6b93ff 0%, #976fff 43.906%, #e46ace 100%));
   }
 
   .red {

@@ -21,6 +21,7 @@
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/lib/gramjs/tl/generateModules.ts",
-    "src/lib/gramjs/tl/types-generator"
+    "src/lib/gramjs/tl/types-generator",
+    "src/util/privacyGuard/litert.js"
   ]
 }

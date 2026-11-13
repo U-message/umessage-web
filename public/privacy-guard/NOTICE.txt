@@ -1,0 +1,12 @@
+U message Privacy Guard on-device models. All inference runs locally in the browser; nothing is uploaded.
+
+face_landmarker.task
+  MediaPipe face detection, face mesh with iris and face blendshapes models.
+  Copyright Google LLC. Licensed under the Apache License, Version 2.0.
+  https://github.com/google-ai-edge/mediapipe
+
+face_embedding.tflite
+  MobileFaceNet (https://github.com/sirius-ai/MobileFaceNet_TF, Apache License 2.0),
+  TFLite conversion from https://github.com/syaringan357/Android-MobileFaceNet-MTCNN-FaceAntiSpoofing (MIT License).
+
+Runtimes: @mediapipe/tasks-vision and @litertjs/core, both Apache License 2.0.

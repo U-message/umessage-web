@@ -221,6 +221,15 @@ export interface AccountSettings {
   umReminderDelayMinutes?: number;
   umReminderSound?: 'notification' | 'none';
   umAdminFolderIds?: number[]; // folders created by "Admin folders", the only ones it may delete
+  // Privacy Guard (camera-based protection from onlookers), defaults as on Android
+  umPgEnabled?: boolean;
+  umPgMode?: 'looking' | 'anyFace';
+  umPgAction?: 'blur' | 'lock';
+  umPgSensitivity?: 0 | 1 | 2;
+  umPgHideOwnerAway?: boolean; // default on
+  umPgProtectMedia?: boolean; // default on
+  umPgProtectComposer?: boolean; // default on
+  umPgPasscode?: UMessagePinHash;
 }
 
 // PBKDF2-SHA256 of the hidden chats PIN, like the Android app; the PIN itself is never stored
@@ -356,6 +365,8 @@ export enum SettingsScreens {
   UMessageStrangerChats,
   UMessageChatTrash,
   UMessageTemplates,
+  UMessagePrivacyGuard,
+  UMessagePrivacyGuardEnroll,
 }
 
 export type StickerSetOrReactionsSetOrRecent = Pick<ApiStickerSet, (

@@ -1,0 +1,66 @@
+.shield {
+  cursor: pointer;
+
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1.5rem;
+
+  text-align: center;
+
+  background: rgb(0 0 0 / 0.35);
+  backdrop-filter: blur(1.75rem) saturate(0.8);
+
+  animation: shield-in 160ms ease-out;
+}
+
+// The composer stays usable when "Protect the message field" is off
+.keepComposer {
+  bottom: 4.5rem;
+}
+
+// Media opened from a chat is covered too ("Protect media viewing")
+.media {
+  position: fixed;
+  z-index: 3000;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.subtitle {
+  margin: 0;
+  color: rgb(255 255 255 / 0.75);
+}
+
+.form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.input {
+  width: 9rem;
+  text-align: center;
+}
+
+@keyframes shield-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

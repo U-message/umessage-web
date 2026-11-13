@@ -32,6 +32,7 @@ export default defineConfig(
     'src/lib/lovely-chart/**',
     'src/lib/music-metadata-browser',
     'src/lib/fastBlur.js',
+    'src/util/privacyGuard/litert.js', // a one-line re-export kept out of TypeScript, see the file
     'src/types/language.d.ts',
     'dist/',
     'public/',

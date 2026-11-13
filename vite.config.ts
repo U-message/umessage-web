@@ -12,7 +12,7 @@ import buildGitInfoPlugin from './plugins/gitInfo.ts';
 import packageJson from './package.json' with { type: 'json' };
 
 const DIR_NAME = dirname(fileURLToPath(import.meta.url));
-const PRODUCTION_URL = 'https://web.telegram.org/a';
+const PRODUCTION_URL = 'https://web.u-message.org/';
 
 const { version: APP_VERSION } = packageJson;
 const BUNDLE_STATS_OUT_DIR = 'bundle-stats';
@@ -50,6 +50,17 @@ const UNWATCHED_STATIC_COPY_TARGETS: Target[] = [
     src: normalizePath(resolve(DIR_NAME, 'node_modules/emoji-data-ios/img-apple-160/**/*')),
     dest: '.',
     rename: { stripBase: 2 },
+  },
+  // U message Privacy Guard: on-device face models run in WebAssembly, loaded only when the feature is on
+  {
+    src: normalizePath(resolve(DIR_NAME, 'node_modules/@mediapipe/tasks-vision/wasm/vision_wasm_internal.*')),
+    dest: 'privacy-guard/mediapipe-1.2.0', // versioned so a CDN never serves a stale runtime
+    rename: { stripBase: true },
+  },
+  {
+    src: normalizePath(resolve(DIR_NAME, 'node_modules/@litertjs/core/wasm/litert_wasm_{internal,compat_internal}.*')),
+    dest: 'privacy-guard/litert-2.6.0',
+    rename: { stripBase: true },
   },
 ];
 

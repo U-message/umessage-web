@@ -49,6 +49,8 @@ import SettingsUMessage from './SettingsUMessage';
 import SettingsUMessageChatTrash from './SettingsUMessageChatTrash';
 import SettingsUMessageGhostUsers from './SettingsUMessageGhostUsers';
 import SettingsUMessageHiddenChats from './SettingsUMessageHiddenChats';
+import SettingsUMessagePrivacyGuard from './SettingsUMessagePrivacyGuard';
+import SettingsUMessagePrivacyGuardEnroll from './SettingsUMessagePrivacyGuardEnroll';
 import SettingsUMessageStrangerChats from './SettingsUMessageStrangerChats';
 import SettingsUMessageTemplates from './SettingsUMessageTemplates';
 import SettingsTwoFa from './twoFa/SettingsTwoFa';
@@ -83,6 +85,8 @@ const UMESSAGE_SUB_SCREENS = [
   SettingsScreens.UMessageChatTrash,
   SettingsScreens.UMessageStrangerChats,
   SettingsScreens.UMessageTemplates,
+  SettingsScreens.UMessagePrivacyGuard,
+  SettingsScreens.UMessagePrivacyGuardEnroll,
 ];
 
 const PASSCODE_SCREENS = [
@@ -404,6 +408,15 @@ const Settings = ({
         return <SettingsUMessageStrangerChats isActive={isScreenActive} onReset={handleReset} />;
       case SettingsScreens.UMessageTemplates:
         return <SettingsUMessageTemplates isActive={isScreenActive} onReset={handleReset} />;
+      case SettingsScreens.UMessagePrivacyGuard:
+        return (
+          <SettingsUMessagePrivacyGuard
+            isActive={isScreenActive || activeScreen === SettingsScreens.UMessagePrivacyGuardEnroll}
+            onReset={handleReset}
+          />
+        );
+      case SettingsScreens.UMessagePrivacyGuardEnroll:
+        return <SettingsUMessagePrivacyGuardEnroll isActive={isScreenActive} onReset={handleReset} />;
       case SettingsScreens.GeneralChatBackground:
         return (
           <SettingsGeneralBackground

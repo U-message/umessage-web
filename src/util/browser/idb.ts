@@ -70,3 +70,4 @@ export const PASSCODE_IDB_STORE = new IdbStore('tt-passcode');
 export const TON_CONNECT_IDB_STORE = new IdbStore('tt-tonconnect');
 export const WALLET_IDB_STORE = new IdbStore('tt-wallet');
 export const UMESSAGE_HISTORY_IDB_STORE = new IdbStore('umessage-history');
+export const PRIVACY_GUARD_IDB_STORE = new IdbStore('umessage-privacy-guard');

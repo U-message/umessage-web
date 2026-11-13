@@ -186,6 +186,9 @@ const SettingsHeader = ({
         return <h3>{lang('UMessageStrangerChats')}</h3>;
       case SettingsScreens.UMessageTemplates:
         return <h3>{lang('UMessageTemplates')}</h3>;
+      case SettingsScreens.UMessagePrivacyGuard:
+      case SettingsScreens.UMessagePrivacyGuardEnroll:
+        return <h3>{lang('PrivacyGuard')}</h3>;
 
       case SettingsScreens.GeneralChatBackground:
         return <h3>{lang('ChatBackground')}</h3>;
