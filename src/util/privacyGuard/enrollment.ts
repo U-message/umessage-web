@@ -5,15 +5,18 @@ import {
 } from './models';
 import { saveOwnerTemplates } from './ownerStore';
 
-// Registers the owner's face (PrivacyGuardEnrollment.java): the head direction lights the matching part of a ring,
-// all the way around, like Face ID. Only identity embeddings are kept, encrypted; no photo is taken or stored.
+// Registers the owner's face. Simpler than the Android ring: a straight look, then a small turn to each side, up and
+// down, each lighting a quarter of the ring. Only identity embeddings are kept, encrypted; no photo is taken or stored.
 
 export type EnrollHint = 'none' | 'noFace' | 'multipleFaces' | 'moveCloser' | 'tooDark' | 'openEyes';
 export type EnrollError = 'camera' | 'models' | 'inconsistent' | 'save';
+export type EnrollStep = 'straight' | 'side' | 'otherSide' | 'up' | 'down';
 export type EnrollProgress = {
   hint: EnrollHint;
+  step: EnrollStep; // what to do next
   straightFill: number; // 0..1
   covered: boolean[]; // ring sectors, 0 = top, clockwise on the mirrored preview
+  face?: { cx: number; cy: number; size: number }; // in video pixels, for the auto-zoomed preview
 };
 
 const STEP_STRAIGHT = 0;
@@ -23,10 +26,14 @@ const STEP_UP = 3;
 const STEP_DOWN = 4;
 const STEP_COUNT = 5;
 const SAMPLES_PER_STEP = 3;
-const MAX_SIDE_SAMPLES = 6;
+const SIDE_SAMPLES = 2;
+// Small turns are enough; measured from the user's own straight look
+const TURN_YAW_DEG = 13;
+const TURN_PITCH_DEG = 9;
+// Below this the face is too small for a usable identity embedding (MobileFaceNet input is 112px)
+const MIN_FACE_PX = 60;
 const SAMPLE_INTERVAL_MS = 220;
 const FRAME_INTERVAL_MS = 110;
-const MIN_FACE_FRACTION = 0.2;
 const MIN_LUMA = 20;
 const MIN_CONSISTENCY = 0.5;
 export const ENROLL_SECTORS = 24;
@@ -48,8 +55,9 @@ export function startEnrollment(
   let smoothPitch = NaN;
   let baselineYaw = 0;
   let baselinePitch = 0;
-  let lastSector = -1;
+  let lastBucket = -1;
   let lastSample = 0;
+  let face: EnrollProgress['face'];
 
   const stop = () => {
     isRunning = false;
@@ -62,31 +70,51 @@ export function startEnrollment(
     onFinish(isSuccess, error);
   };
 
+  const getNextStep = (): EnrollStep => {
+    if (samples[STEP_STRAIGHT].length < SAMPLES_PER_STEP) return 'straight';
+    const hasSide = samples[STEP_SIDE].length >= SIDE_SAMPLES;
+    const hasOtherSide = samples[STEP_OTHER_SIDE].length >= SIDE_SAMPLES;
+    if (!hasSide && !hasOtherSide) return 'side';
+    if (!hasSide || !hasOtherSide) return 'otherSide';
+    if (samples[STEP_UP].length < SIDE_SAMPLES) return 'up';
+    return 'down';
+  };
+
   const report = (hint: EnrollHint) => onProgress({
-    hint, straightFill: Math.min(1, samples[STEP_STRAIGHT].length / SAMPLES_PER_STEP), covered: [...covered],
+    hint,
+    step: getNextStep(),
+    straightFill: Math.min(1, samples[STEP_STRAIGHT].length / SAMPLES_PER_STEP),
+    covered: [...covered],
+    face,
   });
+
+  // Each direction lights its quarter of the ring (up = top, STEP_SIDE = screen right on the mirrored preview)
+  const QUARTERS: Record<number, number> = {
+    [STEP_UP]: 0, [STEP_SIDE]: 1, [STEP_DOWN]: 2, [STEP_OTHER_SIDE]: 3,
+  };
+  const lightQuarter = (bucket: number) => {
+    const quarter = QUARTERS[bucket];
+    if (quarter === undefined) return;
+    const perQuarter = ENROLL_SECTORS / 4;
+    // quarter 0 is centred on the top: sectors -3..2 around 0
+    for (let i = 0; i < perQuarter; i++) {
+      covered[(quarter * perQuarter - perQuarter / 2 + i + ENROLL_SECTORS) % ENROLL_SECTORS] = true;
+    }
+  };
 
   const relYaw = () => smoothYaw - baselineYaw;
   const relPitch = () => (samples[STEP_STRAIGHT].length ? smoothPitch - baselinePitch : smoothPitch);
-  const isStraight = () => Math.abs(relYaw()) < 9 && Math.abs(relPitch()) < 11;
-  const getSector = () => {
-    const x = -relYaw() / 28; // mirrored preview: a negative yaw is a turn toward screen right
-    const y = relPitch() / 20; // up is positive
-    const m = Math.hypot(x, y);
-    if (m < 0.45 || m > 1.7) return -1;
-    let deg = Math.atan2(x, y) * 180 / Math.PI;
-    if (deg < 0) deg += 360;
-    return Math.min(ENROLL_SECTORS - 1, Math.floor(deg / (360 / ENROLL_SECTORS)));
+  const getBucket = (isCalibrated: boolean) => {
+    if (!isCalibrated) return Math.abs(smoothYaw) < 14 && Math.abs(smoothPitch) < 20 ? STEP_STRAIGHT : -1;
+    const yaw = relYaw();
+    const pitch = relPitch();
+    if (Math.abs(yaw) >= TURN_YAW_DEG && Math.abs(yaw) >= Math.abs(pitch)) return yaw < 0 ? STEP_SIDE : STEP_OTHER_SIDE;
+    if (pitch >= TURN_PITCH_DEG) return STEP_UP;
+    if (pitch <= -TURN_PITCH_DEG) return STEP_DOWN;
+    return Math.abs(yaw) < 8 && Math.abs(pitch) < 8 ? STEP_STRAIGHT : -1;
   };
-  const getQuadrant = (sector: number) => {
-    const deg = (sector + 0.5) * 360 / ENROLL_SECTORS;
-    if (deg >= 315 || deg < 45) return STEP_UP;
-    if (deg < 135) return STEP_SIDE;
-    if (deg < 225) return STEP_DOWN;
-    return STEP_OTHER_SIDE;
-  };
-  const isComplete = () => covered.every(Boolean) && samples[STEP_STRAIGHT].length >= SAMPLES_PER_STEP
-    && samples.slice(1).every((list) => list.length > 0);
+  const isComplete = () => samples[STEP_STRAIGHT].length >= SAMPLES_PER_STEP
+    && samples.slice(1).every((list) => list.length >= SIDE_SAMPLES);
 
   const complete = async () => {
     // every orientation must belong to the same person as the straight one
@@ -149,13 +177,14 @@ export function startEnrollment(
           report('noFace');
           return;
         }
-        const [face] = faces;
-        if (faces.length > 1 && faces[1].right - faces[1].left > (face.right - face.left) * 0.4) {
+        const [main] = faces;
+        face = { cx: (main.left + main.right) / 2, cy: (main.top + main.bottom) / 2, size: main.right - main.left };
+        if (faces.length > 1 && faces[1].right - faces[1].left > (main.right - main.left) * 0.4) {
           report('multipleFaces');
           return;
         }
-        const pose = computePose(face);
-        if (pose.faceWidth / video.videoWidth < MIN_FACE_FRACTION) {
+        const pose = computePose(main);
+        if (pose.faceWidth < MIN_FACE_PX) {
           report('moveCloser');
           return;
         }
@@ -171,30 +200,23 @@ export function startEnrollment(
           smoothYaw += (pose.yaw - smoothYaw) * 0.5;
           smoothPitch += (pose.pitch - smoothPitch) * 0.5;
         }
-        // the ring only counts once the straight look is known: directions are measured from it
+        // directions are measured from the straight look; a direction counts after two analysed frames in a row
         const isCalibrated = samples[STEP_STRAIGHT].length >= SAMPLES_PER_STEP;
-        const rawSector = isCalibrated ? getSector() : -1;
-        // a sector is covered only after the head stayed there for two analysed frames in a row
-        const sector = rawSector >= 0 && rawSector === lastSector ? rawSector : -1;
-        lastSector = rawSector;
+        const rawBucket = getBucket(isCalibrated);
+        const bucket = rawBucket >= 0 && rawBucket === lastBucket ? rawBucket : -1;
+        lastBucket = rawBucket;
         let isChanged = false;
-        if (sector >= 0 && !covered[sector]) {
-          covered[sector] = true;
-          isChanged = true;
-        }
-        const bucket = sector >= 0 ? getQuadrant(sector)
-          : !isCalibrated
-            ? (Math.abs(smoothYaw) < 12 && Math.abs(smoothPitch) < 20 ? STEP_STRAIGHT : -1)
-            : (isStraight() ? STEP_STRAIGHT : -1);
-        const limit = bucket === STEP_STRAIGHT ? SAMPLES_PER_STEP : MAX_SIDE_SAMPLES;
+        const limit = bucket === STEP_STRAIGHT ? SAMPLES_PER_STEP : SIDE_SAMPLES;
         if (bucket >= 0 && samples[bucket].length < limit && now - lastSample >= SAMPLE_INTERVAL_MS) {
           lastSample = now;
           const list = samples[bucket];
-          list.push(await embedFace(embedder, video, face));
+          list.push(await embedFace(embedder, video, main));
           if (bucket === STEP_STRAIGHT) {
             // the user's natural straight look becomes the centre
             baselinePitch += (smoothPitch - baselinePitch) / list.length;
             baselineYaw += (smoothYaw - baselineYaw) / list.length;
+          } else if (list.length >= SIDE_SAMPLES) {
+            lightQuarter(bucket);
           }
           isChanged = true;
         }

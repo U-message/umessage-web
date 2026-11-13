@@ -32,8 +32,7 @@ type StateProps = ReturnType<typeof selectUMessagePrivacyGuard>;
 
 // Settings → U message → Privacy Guard, the web port of the Android screen (no screenshot blocking on the web)
 const SettingsUMessagePrivacyGuard = ({
-  isActive, isEnabled, mode, action, sensitivity, shouldHideWhenOwnerAway, shouldProtectMedia, shouldProtectComposer,
-  passcode, onReset,
+  isActive, isEnabled, mode, action, sensitivity, shouldHideWhenOwnerAway, passcode, onReset,
 }: OwnProps & StateProps) => {
   const { setSettingOption, openSettingsScreen, showNotification } = getActions();
   const lang = useLang();
@@ -173,18 +172,6 @@ const SettingsUMessagePrivacyGuard = ({
           subLabel={lang('PrivacyGuardHideOwnerAwayInfo')}
           checked={shouldHideWhenOwnerAway}
           onCheck={(isChecked) => setSettingOption({ umPgHideOwnerAway: isChecked })}
-        />
-        <Checkbox
-          label={lang('PrivacyGuardProtectMedia')}
-          subLabel={lang('PrivacyGuardProtectMediaInfo')}
-          checked={shouldProtectMedia}
-          onCheck={(isChecked) => setSettingOption({ umPgProtectMedia: isChecked })}
-        />
-        <Checkbox
-          label={lang('PrivacyGuardProtectComposer')}
-          subLabel={lang('PrivacyGuardProtectComposerInfo')}
-          checked={shouldProtectComposer}
-          onCheck={(isChecked) => setSettingOption({ umPgProtectComposer: isChecked })}
         />
       </Island>
 

@@ -4693,6 +4693,10 @@
 "PrivacyGuardEnrollFinish" = "Done";
 "PrivacyGuardTryAgain" = "Try Again";
 "PrivacyGuardEnrollStraight" = "Look straight at the screen";
+"PrivacyGuardEnrollSide" = "Slowly turn your head to one side";
+"PrivacyGuardEnrollOtherSide" = "Now turn to the other side";
+"PrivacyGuardEnrollUp" = "Tilt your head slightly up";
+"PrivacyGuardEnrollDown" = "Tilt your head slightly down";
 "UMessagePgCameraNoticeTitle" = "The camera stays on";
 "UMessagePgCameraNoticeText" = "While Privacy Guard is on, the camera light stays on. This is normal: U message uses the camera to notice movement and who is looking at your screen. No photos or videos are taken, nothing is recorded or sent. All data is processed and stored only on your device.";
 "UMessagePgTapOrLook" = "Tap to unlock or look at the camera";

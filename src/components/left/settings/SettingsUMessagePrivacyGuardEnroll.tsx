@@ -5,7 +5,7 @@ import { getActions } from '../../../global';
 
 import type { RegularLangKey } from '../../../types/language';
 import type {
-  EnrollError, EnrollHint, EnrollPhase, EnrollProgress,
+  EnrollError, EnrollHint, EnrollPhase, EnrollProgress, EnrollStep,
 } from '../../../util/privacyGuard/enrollment';
 
 import buildClassName from '../../../util/buildClassName';
@@ -38,6 +38,19 @@ const HINT_KEYS: Record<EnrollHint, RegularLangKey> = {
   openEyes: 'PrivacyGuardEnrollHintEyes',
 };
 
+const STEP_KEYS: Record<EnrollStep, RegularLangKey> = {
+  straight: 'PrivacyGuardEnrollStraight',
+  side: 'PrivacyGuardEnrollSide',
+  otherSide: 'PrivacyGuardEnrollOtherSide',
+  up: 'PrivacyGuardEnrollUp',
+  down: 'PrivacyGuardEnrollDown',
+};
+
+// The preview is zoomed onto the face so it fills the circle wherever the user sits
+const PREVIEW_SIZE = 480;
+const FACE_FILL = 0.55; // face width as a share of the circle
+const ZOOM_SMOOTHING = 0.2;
+
 const ERROR_KEYS: Record<EnrollError, RegularLangKey> = {
   camera: 'PrivacyGuardEnrollFailedCamera',
   models: 'PrivacyGuardEnrollFailedGeneric',
@@ -53,6 +66,8 @@ const SettingsUMessagePrivacyGuardEnroll = ({ isActive, onReset }: OwnProps) => 
   const { setSettingOption } = getActions();
   const lang = useLang();
   const videoRef = useRef<HTMLVideoElement>();
+  const canvasRef = useRef<HTMLCanvasElement>();
+  const faceRef = useRef<EnrollProgress['face']>();
   const stopRef = useRef<NoneToVoidFunction>();
   const [stage, setStage] = useState<Stage>('intro');
   const [progress, setProgress] = useState<EnrollProgress>();
@@ -80,6 +95,47 @@ const SettingsUMessagePrivacyGuardEnroll = ({ isActive, onReset }: OwnProps) => 
   }, [isActive]);
 
   useEffect(() => () => stopRef.current?.(), []);
+
+  useEffect(() => {
+    faceRef.current = progress?.face;
+  }, [progress]);
+
+  // Draws the camera into the circle, cropped around the face (mirrored, smoothly following it)
+  useEffect(() => {
+    if (stage !== 'running') return undefined;
+    let frame = 0;
+    let crop: { x: number; y: number; size: number } | undefined;
+    const draw = () => {
+      frame = requestAnimationFrame(draw);
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas || !video.videoWidth) return;
+      const { videoWidth: vw, videoHeight: vh } = video;
+      const face = faceRef.current;
+      const fullSize = Math.min(vw, vh);
+      const targetSize = face ? Math.min(fullSize, Math.max(face.size / FACE_FILL, fullSize / 3)) : fullSize;
+      const target = {
+        x: (face ? face.cx : vw / 2) - targetSize / 2,
+        y: (face ? face.cy : vh / 2) - targetSize / 2,
+        size: targetSize,
+      };
+      crop = crop ? {
+        x: crop.x + (target.x - crop.x) * ZOOM_SMOOTHING,
+        y: crop.y + (target.y - crop.y) * ZOOM_SMOOTHING,
+        size: crop.size + (target.size - crop.size) * ZOOM_SMOOTHING,
+      } : target;
+      const x = Math.max(0, Math.min(vw - crop.size, crop.x));
+      const y = Math.max(0, Math.min(vh - crop.size, crop.y));
+      const ctx = canvas.getContext('2d')!;
+      ctx.save();
+      ctx.translate(PREVIEW_SIZE, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, x, y, crop.size, crop.size, 0, 0, PREVIEW_SIZE, PREVIEW_SIZE);
+      ctx.restore();
+    };
+    draw();
+    return () => cancelAnimationFrame(frame);
+  }, [stage]);
 
   const handleStart = useLastCallback(() => {
     if (!videoRef.current) return;
@@ -120,7 +176,8 @@ const SettingsUMessagePrivacyGuardEnroll = ({ isActive, onReset }: OwnProps) => 
             <div className={styles.root}>
               <h3>{lang(stage === 'done' ? 'PrivacyGuardEnrollDone' : 'PrivacyGuardEnrollTitle')}</h3>
               <div className={styles.stage}>
-                <video ref={videoRef} className={styles.video} muted playsInline />
+                <video ref={videoRef} className={styles.hiddenVideo} muted playsInline />
+                <canvas ref={canvasRef} className={styles.video} width={PREVIEW_SIZE} height={PREVIEW_SIZE} />
                 <svg className={styles.ring} viewBox="0 0 100 100" aria-hidden>
                   {Array.from({ length: ENROLL_SECTORS }, (_, i) => {
                     // sector 0 is at the top, clockwise
@@ -147,8 +204,8 @@ const SettingsUMessagePrivacyGuardEnroll = ({ isActive, onReset }: OwnProps) => 
                   lang(phase === 'camera' ? 'PrivacyGuardCameraPermission' : 'Loading')
                 )}
                 {stage === 'running' && phase === 'running' && lang(
-                  !progress || (progress.straightFill < 1 && progress.hint === 'none')
-                    ? 'PrivacyGuardEnrollStraight' : HINT_KEYS[progress.hint],
+                  !progress || progress.hint === 'none'
+                    ? STEP_KEYS[progress?.step || 'straight'] : HINT_KEYS[progress.hint],
                 )}
                 {stage === 'done' && lang('PrivacyGuardEnrollDoneInfo')}
                 {stage === 'failed' && lang(ERROR_KEYS[error || 'save'])}

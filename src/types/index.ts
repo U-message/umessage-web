@@ -227,8 +227,6 @@ export interface AccountSettings {
   umPgAction?: 'blur' | 'lock';
   umPgSensitivity?: 0 | 1 | 2;
   umPgHideOwnerAway?: boolean; // default on
-  umPgProtectMedia?: boolean; // default on
-  umPgProtectComposer?: boolean; // default on
   umPgPasscode?: UMessagePinHash;
 }
 

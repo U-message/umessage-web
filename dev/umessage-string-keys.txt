@@ -179,3 +179,7 @@ PrivacyGuardEnrollPrivacy
 PrivacyGuardEnrollFinish
 PrivacyGuardTryAgain
 PrivacyGuardEnrollStraight
+PrivacyGuardEnrollSide
+PrivacyGuardEnrollOtherSide
+PrivacyGuardEnrollUp
+PrivacyGuardEnrollDown

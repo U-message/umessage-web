@@ -3555,6 +3555,10 @@ export interface LangPair {
   'PrivacyGuardEnrollFinish': undefined;
   'PrivacyGuardTryAgain': undefined;
   'PrivacyGuardEnrollStraight': undefined;
+  'PrivacyGuardEnrollSide': undefined;
+  'PrivacyGuardEnrollOtherSide': undefined;
+  'PrivacyGuardEnrollUp': undefined;
+  'PrivacyGuardEnrollDown': undefined;
   'UMessagePgCameraNoticeTitle': undefined;
   'UMessagePgCameraNoticeText': undefined;
   'UMessagePgTapOrLook': undefined;

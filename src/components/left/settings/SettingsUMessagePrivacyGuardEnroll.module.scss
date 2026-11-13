@@ -39,9 +39,6 @@
   position: absolute;
   inset: 1rem;
 
-  // A mirrored preview feels natural; the analysed frames are not mirrored
-  transform: scaleX(-1);
-
   overflow: hidden;
 
   width: calc(100% - 2rem);
@@ -79,4 +76,12 @@
 .privacy {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
+}
+
+// The camera itself stays off-screen; the canvas shows it zoomed onto the face
+.hiddenVideo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
