@@ -155,6 +155,7 @@ type StateProps = {
 };
 
 const APP_OUTDATED_TIMEOUT_MS = 5 * 60 * 1000; // 5 min
+const UMESSAGE_TRASH_CHECK_MS = 60 * 60 * 1000; // 1 hour, as on Android
 const CALL_BUNDLE_LOADING_DELAY_MS = 5000; // 5 sec
 const EDITOR_BUNDLE_LOADING_DELAY_MS = 10000; // 10 sec
 
@@ -217,6 +218,7 @@ const Main = ({
     loadNotificationSettings,
     loadNotificationExceptions,
     updateIsOnline,
+    purgeUMessageTrash,
     onTabFocusChange,
     loadTopPeers,
     loadEmojiKeywords,
@@ -314,11 +316,14 @@ const Main = ({
   }, [isMobile]);
 
   useInterval(checkAppVersion, isMasterTab ? APP_OUTDATED_TIMEOUT_MS : undefined, true);
+  // U message: chats that spent 7 days in the trash are deleted for real
+  useInterval(purgeUMessageTrash, isMasterTab && isSynced ? UMESSAGE_TRASH_CHECK_MS : undefined);
 
   // Initial API calls
   useEffect(() => {
     if (isMasterTab && isSynced) {
       updateIsOnline({ isOnline: true });
+      purgeUMessageTrash();
       loadConfig();
       loadAppConfig();
       loadPeerColors();

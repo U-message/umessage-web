@@ -224,6 +224,12 @@ export interface ActionPayloads {
   setUMessageGhostMode: { isEnabled: boolean };
   setUMessageGhostScope: { scope: UMessageGhostScope };
   setUMessageGhostUsers: { userIds: string[] };
+  setUMessageChatsHidden: { chatIds: string[]; isHidden: boolean };
+  setUMessageFolderHidden: { folderId: number; isHidden: boolean };
+  trashUMessageChat: { chatId: string; action: 'delete' | 'leave' };
+  restoreUMessageChat: { chatId: string };
+  purgeUMessageTrash: { chatIds?: string[]; isAll?: boolean } | undefined;
+  processUMessageIncoming: { chatId: string; message: ApiMessage };
   setSharedSettingOption: Partial<SharedState['settings']> | undefined;
   updatePerformanceSettings: Partial<PerformanceType>;
   loadPasswordInfo: undefined;

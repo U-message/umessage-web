@@ -46,7 +46,11 @@ import SettingsPrivacyVisibilityExceptionList from './SettingsPrivacyVisibilityE
 import SettingsQuickReaction from './SettingsQuickReaction';
 import SettingsStickers from './SettingsStickers';
 import SettingsUMessage from './SettingsUMessage';
+import SettingsUMessageChatTrash from './SettingsUMessageChatTrash';
 import SettingsUMessageGhostUsers from './SettingsUMessageGhostUsers';
+import SettingsUMessageHiddenChats from './SettingsUMessageHiddenChats';
+import SettingsUMessageStrangerChats from './SettingsUMessageStrangerChats';
+import SettingsUMessageTemplates from './SettingsUMessageTemplates';
 import SettingsTwoFa from './twoFa/SettingsTwoFa';
 
 import './Settings.scss';
@@ -71,6 +75,14 @@ const TWO_FA_SCREENS = [
   SettingsScreens.TwoFaRecoveryEmailCurrentPassword,
   SettingsScreens.TwoFaRecoveryEmail,
   SettingsScreens.TwoFaRecoveryEmailCode,
+];
+
+const UMESSAGE_SUB_SCREENS = [
+  SettingsScreens.UMessageGhostUsers,
+  SettingsScreens.UMessageHiddenChats,
+  SettingsScreens.UMessageChatTrash,
+  SettingsScreens.UMessageStrangerChats,
+  SettingsScreens.UMessageTemplates,
 ];
 
 const PASSCODE_SCREENS = [
@@ -376,7 +388,7 @@ const Settings = ({
       case SettingsScreens.UMessage:
         return (
           <SettingsUMessage
-            isActive={isScreenActive || activeScreen === SettingsScreens.UMessageGhostUsers}
+            isActive={isScreenActive || UMESSAGE_SUB_SCREENS.includes(activeScreen)}
             onReset={handleReset}
           />
         );
@@ -384,6 +396,14 @@ const Settings = ({
         return (
           <SettingsUMessageGhostUsers isActive={isScreenActive} onReset={handleReset} />
         );
+      case SettingsScreens.UMessageHiddenChats:
+        return <SettingsUMessageHiddenChats isActive={isScreenActive} onReset={handleReset} />;
+      case SettingsScreens.UMessageChatTrash:
+        return <SettingsUMessageChatTrash isActive={isScreenActive} onReset={handleReset} />;
+      case SettingsScreens.UMessageStrangerChats:
+        return <SettingsUMessageStrangerChats isActive={isScreenActive} onReset={handleReset} />;
+      case SettingsScreens.UMessageTemplates:
+        return <SettingsUMessageTemplates isActive={isScreenActive} onReset={handleReset} />;
       case SettingsScreens.GeneralChatBackground:
         return (
           <SettingsGeneralBackground

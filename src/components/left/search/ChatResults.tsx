@@ -13,7 +13,9 @@ import {
   isChatChannel,
 } from '../../../global/helpers';
 import { filterPeersByQuery } from '../../../global/helpers/peers';
-import { selectSimilarChannelIds, selectTabState } from '../../../global/selectors';
+import {
+  selectIsUMessageTrashed, selectSettingsKeys, selectSimilarChannelIds, selectTabState,
+} from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
 import { getOrderedIds } from '../../../util/folderManager';
 import { unique } from '../../../util/iteratees';
@@ -249,10 +251,13 @@ const ChatResults: FC<OwnProps & StateProps> = ({
       ...localChatIds,
     ];
 
+    // U message: hidden chats and chats in the trash do not show up in search, as on Android
+    const global = getGlobal();
+    const { umHiddenChatIds } = selectSettingsKeys(global);
     return unique([
       ...sortChatIds(localPeerIds, undefined, currentUserId ? [currentUserId] : undefined),
       ...sortChatIds(accountPeerIds || []),
-    ]);
+    ]).filter((id) => !umHiddenChatIds?.includes(id) && !selectIsUMessageTrashed(global, id));
   }, [searchQuery, currentUserId, contactIds, accountPeerIds, isChannelList]);
 
   useHorizontalScroll(chatSelectionRef, !localResults.length || isChannelList, true);

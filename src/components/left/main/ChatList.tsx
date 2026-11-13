@@ -26,6 +26,7 @@ import useInfiniteScroll from '../../../hooks/useInfiniteScroll';
 import { useIntersectionObserver } from '../../../hooks/useIntersectionObserver';
 import useLastCallback from '../../../hooks/useLastCallback';
 import useOrderDiff from './hooks/useOrderDiff';
+import useUMessageVisibleChatIds from './hooks/useUMessageVisibleChatIds';
 
 import InfiniteScroll from '../../ui/InfiniteScroll';
 import Loading from '../../ui/Loading';
@@ -98,7 +99,8 @@ const ChatList = ({
 
   const shouldDisplayArchive = isAllFolder && canDisplayArchive && archiveSettings;
 
-  const orderedIds = useFolderManagerForOrderedIds(resolvedFolderId);
+  const allOrderedIds = useFolderManagerForOrderedIds(resolvedFolderId);
+  const orderedIds = useUMessageVisibleChatIds(allOrderedIds, isSaved);
   usePeerStoriesPolling(orderedIds);
 
   const chatsHeight = (orderedIds?.length || 0) * CHAT_HEIGHT_PX;

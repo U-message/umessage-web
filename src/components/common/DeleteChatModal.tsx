@@ -68,6 +68,7 @@ const DeleteChatModal = ({
     deleteSavedHistory,
     deleteChannel,
     deleteChatUser,
+    trashUMessageChat,
     blockUser,
     deleteChat,
   } = getActions();
@@ -107,6 +108,12 @@ const DeleteChatModal = ({
     } else if ((isChannel || isSuperGroup) && chat.isOwner) {
       deleteChannel({ chatId: chat.id });
     }
+    onClose();
+  });
+
+  // U message: the chat waits 7 days in the trash before the same deletion runs (Settings → U message → Chat trash)
+  const handleMoveToTrash = useLastCallback(() => {
+    trashUMessageChat({ chatId: chat.id, action: isPrivateChat ? 'delete' : 'leave' });
     onClose();
   });
 
@@ -215,6 +222,11 @@ const DeleteChatModal = ({
     >
       {renderContent()}
       <div className="dialog-buttons-column">
+        {!isSavedDialog && (
+          <Button className="confirm-dialog-button" isText onClick={handleMoveToTrash}>
+            {lang('UMessageChatTrashAskTrash')}
+          </Button>
+        )}
         {isBot && !isSavedDialog && (
           <Button color="danger" className="confirm-dialog-button" isText onClick={handleDeleteAndStop}>
             {lang('DeleteAndStop')}

@@ -7,7 +7,7 @@ import type { FolderEditDispatch } from '../../../hooks/reducers/useFoldersReduc
 import type { AnimationLevel } from '../../../types';
 
 import { ALL_FOLDER_ID } from '../../../config';
-import { selectTabState } from '../../../global/selectors';
+import { selectSettingsKeys, selectTabState } from '../../../global/selectors';
 import { selectCurrentLimit } from '../../../global/selectors/limits';
 import { selectSharedSettings } from '../../../global/selectors/sharedState';
 import { IS_TOUCH_ENV } from '../../../util/browser/windowEnvironment';
@@ -292,6 +292,20 @@ const ChatFolders = ({
   );
 };
 
+// U message: hidden folders lose their tab; their chats open from Settings → U message → Hidden chats
+let lastFolderIds: number[] | undefined;
+let lastHiddenFolderIds: number[] | undefined;
+let lastVisibleFolderIds: number[] | undefined;
+function selectVisibleFolderIds(orderedIds?: number[], hiddenIds?: number[]) {
+  if (!orderedIds || !hiddenIds?.length) return orderedIds;
+  if (orderedIds !== lastFolderIds || hiddenIds !== lastHiddenFolderIds) {
+    lastFolderIds = orderedIds;
+    lastHiddenFolderIds = hiddenIds;
+    lastVisibleFolderIds = orderedIds.filter((id) => !hiddenIds.includes(id));
+  }
+  return lastVisibleFolderIds;
+}
+
 export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
     const {
@@ -320,7 +334,7 @@ export default memo(withGlobal<OwnProps>(
     return {
       chatFoldersById,
       folderInvitesById,
-      orderedFolderIds,
+      orderedFolderIds: selectVisibleFolderIds(orderedFolderIds, selectSettingsKeys(global).umHiddenFolderIds),
       activeChatFolder,
       currentUserId,
       animationLevel,

@@ -1,4 +1,4 @@
-import { memo, useMemo } from '../../../lib/teact/teact';
+import { memo, useEffect, useMemo, useState } from '../../../lib/teact/teact';
 import { getActions, withGlobal } from '../../../global';
 
 import type { UMessageGhostScope } from '../../../types';
@@ -14,6 +14,7 @@ import Island, { IslandTitle } from '../../gili/layout/Island';
 import Checkbox from '../../ui/Checkbox';
 import ListItem from '../../ui/ListItem';
 import RadioGroup from '../../ui/RadioGroup';
+import TextArea from '../../ui/TextArea';
 
 type OwnProps = {
   isActive?: boolean;
@@ -28,6 +29,12 @@ type StateProps = {
   shouldConfirmSticker?: boolean;
   shouldConfirmVoice?: boolean;
   shouldConfirmGif?: boolean;
+  hiddenChatsCount: number;
+  trashCount: number;
+  hasStrangerProtection?: boolean;
+  hasAutoReply?: boolean;
+  autoReplyText?: string;
+  templatesCount: number;
 };
 
 const SettingsUMessage = ({
@@ -39,6 +46,12 @@ const SettingsUMessage = ({
   shouldConfirmSticker,
   shouldConfirmVoice,
   shouldConfirmGif,
+  hiddenChatsCount,
+  trashCount,
+  hasStrangerProtection,
+  hasAutoReply,
+  autoReplyText,
+  templatesCount,
   onReset,
 }: OwnProps & StateProps) => {
   const {
@@ -60,6 +73,21 @@ const SettingsUMessage = ({
 
   const handleOpenGhostUsers = useLastCallback(() => {
     openSettingsScreen({ screen: SettingsScreens.UMessageGhostUsers });
+  });
+
+  const [replyDraft, setReplyDraft] = useState(() => autoReplyText ?? lang('UMessageAutoReplyDefault'));
+  useEffect(() => {
+    setReplyDraft(autoReplyText ?? lang('UMessageAutoReplyDefault'));
+  }, [autoReplyText, lang]);
+
+  const handleAutoReplyToggle = useLastCallback((isChecked: boolean) => {
+    // A fresh start answers everyone once again, like on Android
+    setSettingOption({ umAutoReply: isChecked, umAutoRepliedChatIds: [] });
+  });
+
+  const handleReplyTextSave = useLastCallback(() => {
+    const text = replyDraft.trim();
+    setSettingOption({ umAutoReplyText: text || undefined });
   });
 
   return (
@@ -93,6 +121,73 @@ const SettingsUMessage = ({
           </Island>
         </>
       )}
+
+      <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('UMessageSectionProtection')}</IslandTitle>
+      <Island>
+        <ListItem
+          icon="eye-crossed"
+          narrow
+          onClick={() => openSettingsScreen({ screen: SettingsScreens.UMessageHiddenChats })}
+        >
+          <span className="title">{lang('UMessageHiddenChats')}</span>
+          <span className="settings-item__current-value">{hiddenChatsCount || ''}</span>
+        </ListItem>
+        <ListItem
+          icon="delete"
+          narrow
+          onClick={() => openSettingsScreen({ screen: SettingsScreens.UMessageChatTrash })}
+        >
+          <span className="title">{lang('UMessageChatTrash')}</span>
+          <span className="settings-item__current-value">{trashCount || ''}</span>
+        </ListItem>
+      </Island>
+
+      <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('UMessageSectionStrangers')}</IslandTitle>
+      <Island>
+        <Checkbox
+          label={lang('UMessageStrangerProtection')}
+          subLabel={lang('UMessageStrangerProtectionInfo')}
+          checked={Boolean(hasStrangerProtection)}
+          onCheck={(isChecked) => setSettingOption({ umStrangerProtection: isChecked })}
+        />
+        {hasStrangerProtection && (
+          <ListItem
+            icon="user"
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.UMessageStrangerChats })}
+          >
+            <span className="title">{lang('UMessageStrangerChats')}</span>
+          </ListItem>
+        )}
+      </Island>
+
+      <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('UMessageSectionAutoReply')}</IslandTitle>
+      <Island>
+        <Checkbox
+          label={lang('UMessageAutoReply')}
+          subLabel={lang('UMessageAutoReplyInfo')}
+          checked={Boolean(hasAutoReply)}
+          onCheck={handleAutoReplyToggle}
+        />
+        {hasAutoReply && (
+          <div className="settings-item">
+            <TextArea
+              label={lang('UMessageAutoReplyText')}
+              value={replyDraft}
+              onChange={(e) => setReplyDraft(e.currentTarget.value)}
+              onBlur={handleReplyTextSave}
+            />
+          </div>
+        )}
+        <ListItem
+          icon="reply"
+          narrow
+          onClick={() => openSettingsScreen({ screen: SettingsScreens.UMessageTemplates })}
+        >
+          <span className="title">{lang('UMessageTemplates')}</span>
+          <span className="settings-item__current-value">{templatesCount || ''}</span>
+        </ListItem>
+      </Island>
 
       <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('UMessageSectionGeneral')}</IslandTitle>
       <Island>
@@ -133,6 +228,7 @@ export default memo(withGlobal<OwnProps>(
   (global): Complete<StateProps> => {
     const {
       umGhostMode, umGhostScope, umGhostUserIds, umBlockAds, umConfirmSticker, umConfirmVoice, umConfirmGif,
+      umHiddenChatIds, umTrash, umStrangerProtection, umAutoReply, umAutoReplyText, umTemplates,
     } = selectSettingsKeys(global);
 
     return {
@@ -143,6 +239,12 @@ export default memo(withGlobal<OwnProps>(
       shouldConfirmSticker: umConfirmSticker,
       shouldConfirmVoice: umConfirmVoice,
       shouldConfirmGif: umConfirmGif,
+      hiddenChatsCount: umHiddenChatIds?.length || 0,
+      trashCount: umTrash?.length || 0,
+      hasStrangerProtection: umStrangerProtection,
+      hasAutoReply: umAutoReply,
+      autoReplyText: umAutoReplyText,
+      templatesCount: umTemplates?.length || 0,
     };
   },
 )(SettingsUMessage));

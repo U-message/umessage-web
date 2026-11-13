@@ -256,6 +256,10 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
         message,
       });
 
+      if (!isLocal) {
+        actions.processUMessageIncoming({ chatId, message });
+      }
+
       return undefined;
     }
 

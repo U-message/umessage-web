@@ -178,6 +178,14 @@ const SettingsHeader = ({
         return <h3>{lang('AppName')}</h3>;
       case SettingsScreens.UMessageGhostUsers:
         return <h3>{lang('UMessageGhostUsers')}</h3>;
+      case SettingsScreens.UMessageHiddenChats:
+        return <h3>{lang('UMessageHiddenChats')}</h3>;
+      case SettingsScreens.UMessageChatTrash:
+        return <h3>{lang('UMessageChatTrash')}</h3>;
+      case SettingsScreens.UMessageStrangerChats:
+        return <h3>{lang('UMessageStrangerChats')}</h3>;
+      case SettingsScreens.UMessageTemplates:
+        return <h3>{lang('UMessageTemplates')}</h3>;
 
       case SettingsScreens.GeneralChatBackground:
         return <h3>{lang('ChatBackground')}</h3>;

@@ -9,7 +9,7 @@ import { ARCHIVED_FOLDER_ID, SERVICE_NOTIFICATIONS_USER_ID } from '../config';
 import {
   getCanDeleteChat, isChatArchived, isChatChannel, isChatCommunity, isChatGroup,
 } from '../global/helpers';
-import { selectChat, selectIsChatPinned } from '../global/selectors';
+import { selectChat, selectIsChatPinned, selectSettingsKeys } from '../global/selectors';
 import { selectThreadReadState } from '../global/selectors/threads';
 import { IS_TAURI } from '../util/browser/globalEnvironment';
 import { IS_OPEN_IN_NEW_TAB_SUPPORTED } from '../util/browser/windowEnvironment';
@@ -61,6 +61,7 @@ const useChatContextActions = ({
     markChatUnread,
     openChatInNewTab,
     openQuickPreview,
+    setUMessageChatsHidden,
   } = getActions();
 
   const lang = useLang();
@@ -93,6 +94,11 @@ const useChatContextActions = ({
     return selectIsChatPinned(global, chat.id, isChatArchived(chat) ? ARCHIVED_FOLDER_ID : undefined);
   }, [chat, isInCommunityPanel, isPinned]);
   const isResolvedPinned = useSelector(isResolvedPinnedSelector);
+
+  const isUMessageHiddenSelector = useCallback((global: GlobalState) => {
+    return Boolean(chat && selectSettingsKeys(global).umHiddenChatIds?.includes(chat.id));
+  }, [chat]);
+  const isUMessageHidden = useSelector(isUMessageHiddenSelector);
 
   const deleteTitle = useMemo(() => {
     if (!chat) return undefined;
@@ -235,6 +241,13 @@ const useChatContextActions = ({
     const isInFolder = folderId !== undefined;
     const canManageListPlacement = !(isInCommunityPanel && isLinkedCommunityCollapsed);
 
+    // U message: hidden chats leave the chat list and open only from Settings → U message → Hidden chats
+    const actionUMessageHide: MenuItemContextAction = {
+      title: lang(isUMessageHidden ? 'UMessageUnhideChat' : 'UMessageHideChat'),
+      icon: isUMessageHidden ? 'eye-outline' : 'eye-crossed',
+      handler: () => setUMessageChatsHidden({ chatIds: [chat.id], isHidden: !isUMessageHidden }),
+    };
+
     return compact<MenuItemContextAction>([
       actionOpenInNewTab,
       actionQuickPreview,
@@ -244,6 +257,7 @@ const useChatContextActions = ({
       canManageListPlacement && actionPin,
       !isSelf && actionMute,
       !isSelf && !isServiceNotifications && !isInFolder && canManageListPlacement && actionArchive,
+      !isSelf && !isServiceNotifications && actionUMessageHide,
       actionReport,
       actionDelete,
     ]);
@@ -251,7 +265,7 @@ const useChatContextActions = ({
     chat, isPreview, lang, isSavedDialog, isResolvedPinned, deleteTitle, handleDelete, canChangeFolder,
     handleChatFolderChange, isMuted, handleUnmute, handleMute, isInSearch, chatReadState, topicsReadStates,
     handleReport, user, folderId, isSelf, isServiceNotifications, currentUserId, isInCommunityPanel,
-    isLinkedCommunityCollapsed,
+    isLinkedCommunityCollapsed, isUMessageHidden,
   ]);
 
   return preparedActions;

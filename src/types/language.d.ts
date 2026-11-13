@@ -3402,6 +3402,58 @@ export interface LangPair {
   'UMessageConfirmGif': undefined;
   'UMessageConfirmGifInfo': undefined;
   'UMessageConfirmGifAsk': undefined;
+  'UMessageSectionProtection': undefined;
+  'UMessageHideChat': undefined;
+  'UMessageHiddenChats': undefined;
+  'UMessageHiddenChatsInfo': undefined;
+  'UMessageHiddenChatsEmpty': undefined;
+  'UMessageUnhideChat': undefined;
+  'UMessageUnhideChatInfo': undefined;
+  'UMessageChatsShown': undefined;
+  'UMessageHiddenFolders': undefined;
+  'UMessageHideFolder': undefined;
+  'UMessageHiddenFoldersEmpty': undefined;
+  'UMessageShowFolder': undefined;
+  'UMessageHiddenAccess': undefined;
+  'UMessageHiddenAccessNewChat': undefined;
+  'UMessageHiddenPinNew': undefined;
+  'UMessageHiddenPinPrompt': undefined;
+  'UMessageHiddenPasswordInfo': undefined;
+  'UMessageHiddenPasswordSaved': undefined;
+  'UMessageHiddenPasswordChange': undefined;
+  'UMessageHiddenPasswordSet': undefined;
+  'UMessageHiddenPasswordMismatch': undefined;
+  'UMessageHiddenPasswordWrong': undefined;
+  'UMessageHiddenPasswordRepeat': undefined;
+  'UMessageChatTrash': undefined;
+  'UMessageChatTrashSettingsInfo': undefined;
+  'UMessageChatTrashed': undefined;
+  'UMessageChatTrashAskTrash': undefined;
+  'UMessageChatTrashedInfo': undefined;
+  'UMessageChatTrashRestore': undefined;
+  'UMessageChatTrashDeleteNow': undefined;
+  'UMessageChatTrashEmpty': undefined;
+  'UMessageChatTrashEmptyConfirm': undefined;
+  'UMessageChatTrashEmptyInfo': undefined;
+  'UMessageChatTrashInfo': undefined;
+  'UMessageSectionStrangers': undefined;
+  'UMessageStrangerProtection': undefined;
+  'UMessageStrangerProtectionInfo': undefined;
+  'UMessageStrangerChats': undefined;
+  'UMessageStrangerChatsInfo': undefined;
+  'UMessageStrangerChatsEmpty': undefined;
+  'UMessageSectionAutoReply': undefined;
+  'UMessageAutoReply': undefined;
+  'UMessageAutoReplyInfo': undefined;
+  'UMessageAutoReplyText': undefined;
+  'UMessageAutoReplyDefault': undefined;
+  'UMessageTemplates': undefined;
+  'UMessageTemplatesInfo': undefined;
+  'UMessageTemplateAdd': undefined;
+  'UMessageTemplateEdit': undefined;
+  'UMessageTemplateShortcut': undefined;
+  'UMessageTemplateText': undefined;
+  'UMessageTemplateEmpty': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {
@@ -5655,6 +5707,9 @@ export interface LangPairWithVariables<V = LangVariable> {
   'PeerPickerUnknownPeer': {
     'id': V;
   };
+  'UMessageChatTrashDaysLeft': {
+    '0': V;
+  };
 }
 
 export interface LangPairPlural {
@@ -7886,6 +7941,11 @@ export interface LangKeyGroups {
     keys:
       | 'PeerPickerUnknownPeer';
     variables: 'id';
+  };
+  '0': {
+    keys:
+      | 'UMessageChatTrashDaysLeft';
+    variables: '0';
   };
 }
 

@@ -203,7 +203,24 @@ export interface AccountSettings {
   umConfirmSticker?: boolean;
   umConfirmVoice?: boolean;
   umConfirmGif?: boolean;
+  umHiddenChatIds?: string[];
+  umHiddenFolderIds?: number[];
+  umHiddenPin?: UMessagePinHash;
+  umTrash?: UMessageTrashEntry[];
+  umStrangerProtection?: boolean;
+  umAutoReply?: boolean;
+  umAutoReplyText?: string;
+  umAutoRepliedChatIds?: string[];
+  umTemplates?: UMessageTemplate[];
 }
+
+// PBKDF2-SHA256 of the hidden chats PIN, like the Android app; the PIN itself is never stored
+export type UMessagePinHash = { salt: string; hash: string; iterations: number };
+
+// A deleted chat kept out of the list for 7 days; the real deletion ("delete" or "leave") runs afterwards
+export type UMessageTrashEntry = { chatId: string; action: 'delete' | 'leave'; trashedAt: number };
+
+export type UMessageTemplate = { shortcut: string; text: string };
 
 export type UMessageGhostScope = 'all' | 'only' | 'except';
 
@@ -326,6 +343,10 @@ export enum SettingsScreens {
   Passkeys,
   UMessage,
   UMessageGhostUsers,
+  UMessageHiddenChats,
+  UMessageStrangerChats,
+  UMessageChatTrash,
+  UMessageTemplates,
 }
 
 export type StickerSetOrReactionsSetOrRecent = Pick<ApiStickerSet, (

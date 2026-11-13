@@ -26,6 +26,7 @@ import {
   selectCurrentMessageList,
   selectCustomEmoji,
   selectIsChatWithSelf,
+  selectIsUMessageHiddenFromList,
   selectNotifyDefaults,
   selectNotifyException,
   selectPeer,
@@ -314,7 +315,9 @@ function checkIfShouldNotify(chat: ApiChat, message: Partial<ApiMessage>) {
   const shouldSkipPinnedMessageNotification = isPinMessage && !shouldNotifyAboutPinnedMessages;
   const shouldNotifyAboutMessage = message.content?.action?.type !== 'phoneCall';
   if (shouldSkipPinnedMessageNotification || (isMuted && !shouldIgnoreMute) || !shouldNotifyAboutMessage
-    || chat.isNotJoined || !chat.isListed || selectIsChatWithSelf(global, chat.id)) {
+    || chat.isNotJoined || !chat.isListed || selectIsChatWithSelf(global, chat.id)
+    // U message: hidden chats, chats in the trash and protected strangers stay silent
+    || selectIsUMessageHiddenFromList(global, chat.id)) {
     return false;
   }
   // On touch devices show notifications when chat is not active
