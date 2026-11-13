@@ -5,9 +5,7 @@ import { withGlobal } from '../../../global';
 
 import type { GuardSnapshot } from '../../../util/privacyGuard/engine';
 
-import {
-  selectCurrentMessageList, selectUMessagePrivacyGuard,
-} from '../../../global/selectors';
+import { selectUMessagePrivacyGuard } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
 import {
   dismissGuard, getGuardSnapshot, setGuardConfig, startGuard, stopGuard, subscribeToGuard,
@@ -32,9 +30,7 @@ const GUARD_RETRY_MS = 3000;
 const MONKEY_PEEK_INTERVAL_MS = 1800;
 const LOCK_ICON_SIZE = 120;
 
-type StateProps = ReturnType<typeof selectUMessagePrivacyGuard> & {
-  chatId?: string;
-};
+type StateProps = ReturnType<typeof selectUMessagePrivacyGuard>;
 
 function useIsPageVisible() {
   const [isVisible, setIsVisible] = useState(() => document.visibilityState === 'visible');
@@ -46,10 +42,9 @@ function useIsPageVisible() {
   return isVisible;
 }
 
-// Privacy Guard over the open chat: runs the camera only while a chat is open and the page is visible, and hides the
-// chat (blur, or lock until the owner is back or the passcode is entered) when someone else looks at the screen
+// Privacy Guard: runs the camera while U message is open and the page is visible, and hides everything (blur, or lock until the owner is back or the passcode is entered) when someone else looks at the screen
 const PrivacyGuardShield = ({
-  isEnabled, mode, action, sensitivity, shouldHideWhenOwnerAway, passcode, chatId,
+  isEnabled, mode, action, sensitivity, shouldHideWhenOwnerAway, passcode,
 }: StateProps) => {
   const lang = useLang();
   const isPageVisible = useIsPageVisible();
@@ -61,7 +56,8 @@ const PrivacyGuardShield = ({
   const [isChecking, setIsChecking] = useState(false);
   const [pinError, setPinError] = useState<string>();
 
-  const shouldRun = isEnabled && Boolean(chatId) && isPageVisible;
+  // The chat list is private too: the guard runs whenever U message is open and visible, not only inside a chat
+  const shouldRun = isEnabled && isPageVisible;
 
   useEffect(() => subscribeToGuard(setGuard), []);
 
@@ -210,9 +206,6 @@ const PrivacyGuardShield = ({
 
 export default memo(withGlobal(
   (global): Complete<StateProps> => {
-    return {
-      ...selectUMessagePrivacyGuard(global),
-      chatId: selectCurrentMessageList(global)?.chatId,
-    };
+    return selectUMessagePrivacyGuard(global);
   },
 )(PrivacyGuardShield));
