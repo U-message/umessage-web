@@ -795,6 +795,8 @@ export interface ApiMessage {
   viewsCount?: number;
   forwardsCount?: number;
   isEdited?: boolean;
+  // U message: kept after the sender deleted it ("Save deleted messages"), local only
+  umDeletedAt?: number;
   editDate?: number;
   isMentioned?: boolean;
   isMediaUnread?: boolean;

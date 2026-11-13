@@ -1,16 +1,19 @@
-import type { ApiPrivacySettings } from '../../../api/types';
+import type { ApiChatFolder, ApiMessage, ApiPrivacySettings } from '../../../api/types';
 import type { UMessageGhostScope, UMessageTrashEntry } from '../../../types';
 import type { RequiredGlobalActions } from '../../index';
 import type { ActionReturnType, GlobalState } from '../../types';
 import { MAIN_THREAD_ID } from '../../../api/types';
 
-import { SERVICE_NOTIFICATIONS_USER_ID } from '../../../config';
+import { ARCHIVED_FOLDER_ID, SERVICE_NOTIFICATIONS_USER_ID } from '../../../config';
 import { isUserId } from '../../../util/entities/ids';
 import { getCurrentTabId, isCurrentTabMaster } from '../../../util/establishMultitabRole';
 import { unique } from '../../../util/iteratees';
 import { getTranslationFn } from '../../../util/localization';
+import { notifyUMessageReminder } from '../../../util/notifications';
 import { callApi } from '../../../api/gramjs';
-import { buildApiInputPrivacyRules, isChatBasicGroup, isUserBot } from '../../helpers';
+import {
+  buildApiInputPrivacyRules, isChatBasicGroup, isChatChannel, isUserBot,
+} from '../../helpers';
 import { getIsChatMuted } from '../../helpers/notifications';
 import { addActionHandler, getGlobal, setGlobal } from '../../index';
 import { replaceSettings } from '../../reducers';
@@ -25,6 +28,8 @@ import {
   selectUser,
   UMESSAGE_TRASH_TTL_MS,
 } from '../../selectors';
+import { selectCurrentLimit } from '../../selectors/limits';
+import { selectThreadReadState } from '../../selectors/threads';
 
 // Ghost mode's online part, ported from the Android app's UMessageGhostScope:
 // "everyone" keeps the client offline; the two list scopes stay online and let the
@@ -248,7 +253,10 @@ function runTrashDeletion(global: GlobalState, actions: RequiredGlobalActions, e
 
 addActionHandler('processUMessageIncoming', (global, actions, payload): ActionReturnType => {
   const { chatId, message } = payload;
-  if (!isCurrentTabMaster() || message.isOutgoing || message.content.action || !isUserId(chatId)) return undefined;
+  if (!isCurrentTabMaster() || message.isOutgoing || message.content.action) return undefined;
+
+  scheduleReminder(global, chatId, message);
+  if (!isUserId(chatId)) return undefined;
 
   const { umAutoReply, umAutoReplyText, umAutoRepliedChatIds = [] } = selectSettingsKeys(global);
   if (!umAutoReply || umAutoRepliedChatIds.includes(chatId)) return undefined;
@@ -271,4 +279,97 @@ addActionHandler('processUMessageIncoming', (global, actions, payload): ActionRe
     tabId: getCurrentTabId(),
   });
   return undefined;
+});
+
+// Unread message reminder: if the first unread message of a chat is still unread after the delay, remind once
+
+const DEFAULT_REMINDER_DELAY_MINUTES = 5;
+const reminderTimers = new Map<string, number>();
+
+function scheduleReminder(global: GlobalState, chatId: string, message: ApiMessage) {
+  const { umReminder, umReminderDelayMinutes = DEFAULT_REMINDER_DELAY_MINUTES } = selectSettingsKeys(global);
+  // The reminder counts from the first unread message
+  if (!umReminder || reminderTimers.has(chatId) || selectIsUMessageHiddenFromList(global, chatId)) return;
+
+  const timer = window.setTimeout(() => {
+    reminderTimers.delete(chatId);
+    const current = getGlobal();
+    const { umReminder: isStillOn, umReminderSound } = selectSettingsKeys(current);
+    const chat = selectChat(current, chatId);
+    if (!isStillOn || !chat) return;
+
+    const readState = selectThreadReadState(current, chatId, MAIN_THREAD_ID);
+    const isRead = (readState?.lastReadInboxMessageId || 0) >= message.id || !readState?.unreadCount;
+    const isMuted = getIsChatMuted(chat, selectNotifyDefaults(current), selectNotifyException(current, chatId));
+    if (isRead || isMuted) return;
+
+    void notifyUMessageReminder({ chat, message, isSilent: umReminderSound === 'none' });
+  }, umReminderDelayMinutes * 60 * 1000);
+  reminderTimers.set(chatId, timer);
+}
+
+// Admin folders: four real folders (my groups, my channels, groups I admin, channels I admin) on the server,
+// so they sync like any other folder. Only folders this feature created are ever deleted.
+
+const ADMIN_FOLDERS = [
+  { titleKey: 'UMessageFolderMyGroups', emoticon: '👑' },
+  { titleKey: 'UMessageFolderMyChannels', emoticon: '📢' },
+  { titleKey: 'UMessageFolderAdminGroups', emoticon: '👥' },
+  { titleKey: 'UMessageFolderAdminChannels', emoticon: '⭐' },
+] as const;
+
+addActionHandler('setUMessageAdminFolders', async (global, actions, payload): Promise<void> => {
+  const tabId = getCurrentTabId();
+
+  if (!payload.isEnabled) {
+    const createdIds = selectSettingsKeys(global).umAdminFolderIds || [];
+    for (const id of createdIds) {
+      if (global.chatFolders.byId[id]) await callApi('deleteChatFolder', id);
+      actions.apiUpdate({ '@type': 'updateChatFolder', id, folder: undefined });
+    }
+    global = getGlobal();
+    global = replaceSettings(global, { umAdminFolderIds: undefined });
+    setGlobal(global);
+    return;
+  }
+
+  const groups: string[][] = [[], [], [], []];
+  const listIds = unique([...global.chats.listIds.active || [], ...global.chats.listIds.archived || []]);
+  listIds.forEach((chatId) => {
+    const chat = selectChat(global, chatId);
+    if (!chat || isUserId(chatId) || chat.isNotJoined || chat.isForbidden || chat.migratedTo) return;
+    const isChannel = isChatChannel(chat);
+    if (chat.isOwner) groups[isChannel ? 1 : 0].push(chatId);
+    else if (chat.adminRights) groups[isChannel ? 3 : 2].push(chatId);
+  });
+
+  const lang = getTranslationFn();
+  const maxChats = selectCurrentLimit(global, 'dialogFiltersChats');
+  let freeFolders = selectCurrentLimit(global, 'dialogFilters') - Object.keys(global.chatFolders.byId).length;
+  let nextId = Math.max(...(global.chatFolders.orderedIds || []), ARCHIVED_FOLDER_ID) + 1;
+  const createdIds: number[] = [];
+
+  for (let type = 0; type < ADMIN_FOLDERS.length; type++) {
+    if (!groups[type].length || freeFolders <= 0) continue;
+    const folder: ApiChatFolder = {
+      id: nextId,
+      title: { text: lang(ADMIN_FOLDERS[type].titleKey) },
+      emoticon: ADMIN_FOLDERS[type].emoticon,
+      includedChatIds: groups[type].slice(0, maxChats),
+      excludedChatIds: [],
+    };
+    await callApi('editChatFolder', { id: folder.id, folderUpdate: folder });
+    actions.apiUpdate({ '@type': 'updateChatFolder', id: folder.id, folder });
+    createdIds.push(folder.id);
+    nextId += 1;
+    freeFolders -= 1;
+  }
+
+  if (!createdIds.length) {
+    actions.showNotification({ message: { key: 'UMessageAdminFoldersNone' }, tabId });
+    return;
+  }
+  global = getGlobal();
+  global = replaceSettings(global, { umAdminFolderIds: createdIds });
+  setGlobal(global);
 });

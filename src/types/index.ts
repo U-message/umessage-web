@@ -212,6 +212,15 @@ export interface AccountSettings {
   umAutoReplyText?: string;
   umAutoRepliedChatIds?: string[];
   umTemplates?: UMessageTemplate[];
+  umSaveDeleted?: boolean;
+  umFocusEnabled?: boolean;
+  umFocusStart?: number; // minutes after midnight
+  umFocusEnd?: number;
+  umFocusFolderIds?: number[];
+  umReminder?: boolean;
+  umReminderDelayMinutes?: number;
+  umReminderSound?: 'notification' | 'none';
+  umAdminFolderIds?: number[]; // folders created by "Admin folders", the only ones it may delete
 }
 
 // PBKDF2-SHA256 of the hidden chats PIN, like the Android app; the PIN itself is never stored

@@ -24,6 +24,7 @@ import { buildSearchResultKey } from '../../../util/keys/searchResultKey';
 import { notifyAboutMessage } from '../../../util/notifications';
 import { onTickEnd } from '../../../util/schedulers';
 import { getServerTime } from '../../../util/serverTime';
+import { isOwnDeletion, saveDeletedMessage, saveEditVersion } from '../../../util/umessageHistory';
 import { callApi } from '../../../api/gramjs';
 import {
   addPaidReaction,
@@ -111,6 +112,7 @@ import {
   selectPinnedIds,
   selectScheduledIds,
   selectScheduledMessage,
+  selectSettingsKeys,
   selectTabState,
   selectTopic,
   selectTopicFromMessage,
@@ -615,6 +617,15 @@ addActionHandler('apiUpdate', (global, actions, update): ActionReturnType => {
       } = update;
 
       const currentMessage = selectChatMessage(global, chatId, id);
+
+      // U message: the version before an edit goes to the edit history
+      const previousText = currentMessage?.content.text?.text;
+      if (previousText && message.isEdited && message.content?.text?.text !== undefined
+        && message.content.text.text !== previousText && selectSettingsKeys(global).umSaveDeleted) {
+        void saveEditVersion(global.currentUserId!, chatId, id, {
+          text: previousText, date: currentMessage.editDate || currentMessage.date,
+        });
+      }
 
       if (message.reactions) {
         global = updateReactions(
@@ -1657,6 +1668,28 @@ export function deleteThread<T extends GlobalState>(
 export function deleteMessages<T extends GlobalState>(
   global: T, chatId: string | undefined, ids: number[], actions: RequiredGlobalActions,
 ) {
+  // U message "Save deleted messages": messages others delete stay, marked as deleted
+  if (selectSettingsKeys(global).umSaveDeleted) {
+    const keptIds = new Set<number>();
+    ids.forEach((id) => {
+      const messageChatId = chatId || selectCommonBoxChatId(global, id);
+      if (!messageChatId || isOwnDeletion(messageChatId, id)) return;
+      const message = selectChatMessage(global, messageChatId, id);
+      if (!message || message.isOutgoing || message.content.action || message.umDeletedAt) return;
+
+      global = updateChatMessage(global, messageChatId, id, { umDeletedAt: Date.now() });
+      saveDeletedMessage(global.currentUserId!, message);
+      keptIds.add(id);
+    });
+    if (keptIds.size) {
+      ids = ids.filter((id) => !keptIds.has(id));
+      if (!ids.length) {
+        setGlobal(global);
+        return;
+      }
+    }
+  }
+
   // Channel update
 
   if (chatId) {

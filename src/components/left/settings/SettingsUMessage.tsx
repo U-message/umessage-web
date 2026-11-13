@@ -15,6 +15,7 @@ import Checkbox from '../../ui/Checkbox';
 import ListItem from '../../ui/ListItem';
 import RadioGroup from '../../ui/RadioGroup';
 import TextArea from '../../ui/TextArea';
+import SettingsUMessageExtras from './SettingsUMessageExtras';
 
 type OwnProps = {
   isActive?: boolean;
@@ -188,6 +189,8 @@ const SettingsUMessage = ({
           <span className="settings-item__current-value">{templatesCount || ''}</span>
         </ListItem>
       </Island>
+
+      <SettingsUMessageExtras />
 
       <IslandTitle dir={lang.isRtl ? 'rtl' : undefined}>{lang('UMessageSectionGeneral')}</IslandTitle>
       <Island>

@@ -36,6 +36,7 @@ import {
   loadStoredSession,
   storeSession,
 } from '../../../util/sessions';
+import { clearHistoryForUser as clearUMessageHistoryForUser } from '../../../util/umessageHistory';
 import { clearWallpaperBlobs } from '../../../util/wallpaperStorage';
 import { interruptWebLogin, rejectWebLogin, resolveWebLogin } from '../../../util/webLogin';
 import { webLoginHandoffPromise } from '../../../util/webLoginHandoff';
@@ -267,6 +268,7 @@ addActionHandler('requestChannelDifference', (global, actions, payload): ActionR
 });
 
 addActionHandler('reset', async (global, actions): Promise<void> => {
+  if (global.currentUserId) void clearUMessageHistoryForUser(global.currentUserId);
   void cacheApi.clear(MEDIA_CACHE_NAME);
   void cacheApi.clear(MEDIA_CACHE_NAME_AVATARS);
   void cacheApi.clear(MEDIA_PROGRESSIVE_CACHE_NAME);

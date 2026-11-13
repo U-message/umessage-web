@@ -55,3 +55,15 @@ export function selectIsUMessageHiddenFromList<T extends GlobalState>(global: T,
     || selectIsUMessageTrashed(global, chatId)
     || (Boolean(umStrangerProtection) && selectIsUMessageStranger(global, chatId));
 }
+
+// Focus mode, as on Android: inside the focus hours (which may wrap midnight) only allowed folders notify
+export function selectIsUMessageFocusActiveNow<T extends GlobalState>(global: T, now = new Date()) {
+  const { umFocusEnabled, umFocusStart = 9 * 60, umFocusEnd = 18 * 60 } = selectSettingsKeys(global);
+  if (!umFocusEnabled) return false;
+
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  if (umFocusStart === umFocusEnd) return true;
+  return umFocusStart < umFocusEnd
+    ? minutes >= umFocusStart && minutes < umFocusEnd
+    : minutes >= umFocusStart || minutes < umFocusEnd;
+}

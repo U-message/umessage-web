@@ -48,12 +48,12 @@ class IdbStore {
     return delMany(keys, this.store);
   }
 
-  public entries() {
-    return getEntries(this.store);
+  public entries<K extends IDBValidKey = IDBValidKey, V = unknown>() {
+    return getEntries<K, V>(this.store);
   }
 
-  public keys() {
-    return getKeys(this.store);
+  public keys<K extends IDBValidKey = IDBValidKey>() {
+    return getKeys<K>(this.store);
   }
 
   public values<T = unknown>() {
@@ -69,3 +69,4 @@ export const MAIN_IDB_STORE = new IdbStore('tt-data');
 export const PASSCODE_IDB_STORE = new IdbStore('tt-passcode');
 export const TON_CONNECT_IDB_STORE = new IdbStore('tt-tonconnect');
 export const WALLET_IDB_STORE = new IdbStore('tt-wallet');
+export const UMESSAGE_HISTORY_IDB_STORE = new IdbStore('umessage-history');

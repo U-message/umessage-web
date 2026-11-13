@@ -221,6 +221,7 @@ const MessageMeta = ({
           </>
         )}
         {message.isEdited && !shouldShowPrimaryEditedDate && `${lang('MessageMetaEdited')} `}
+        {Boolean(message.umDeletedAt) && `${lang('UMessageDeletedMark')} `}
         {message.isVideoProcessingPending && !shouldShowPrimaryEditedDate && `${lang('MessageMetaApproximate')} `}
         {date}
       </span>

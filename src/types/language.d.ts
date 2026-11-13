@@ -3454,6 +3454,41 @@ export interface LangPair {
   'UMessageTemplateShortcut': undefined;
   'UMessageTemplateText': undefined;
   'UMessageTemplateEmpty': undefined;
+  'UMessageSectionReminderFocus': undefined;
+  'UMessageFocus': undefined;
+  'UMessageFocusEnable': undefined;
+  'UMessageFocusFrom': undefined;
+  'UMessageFocusTo': undefined;
+  'UMessageFocusInfo': undefined;
+  'UMessageFocusFolders': undefined;
+  'UMessageFocusFoldersInfo': undefined;
+  'UMessageFocusNoFolders': undefined;
+  'UMessageSectionReminder': undefined;
+  'UMessageReminder': undefined;
+  'UMessageReminderInfo': undefined;
+  'UMessageReminderDelay': undefined;
+  'UMessageReminderSound': undefined;
+  'UMessageSoundNotification': undefined;
+  'UMessageSoundNone': undefined;
+  'UMessageSaveDeleted': undefined;
+  'UMessageSaveDeletedInfo': undefined;
+  'UMessageEditHistory': undefined;
+  'UMessageEditHistoryEmpty': undefined;
+  'UMessageDeletedMark': undefined;
+  'UMessageAdminFolders': undefined;
+  'UMessageAdminFoldersInfo': undefined;
+  'UMessageAdminFoldersNone': undefined;
+  'UMessageLocalData': undefined;
+  'UMessageLocalHistorySize': undefined;
+  'UMessageLocalDataClear': undefined;
+  'UMessageLocalDataInfo': undefined;
+  'UMessageLocalDataConfirm': undefined;
+  'UMessageLocalDataCleared': undefined;
+  'UMessageFolderMyGroups': undefined;
+  'UMessageFolderMyChannels': undefined;
+  'UMessageFolderAdminGroups': undefined;
+  'UMessageFolderAdminChannels': undefined;
+  'UMessageSectionFolders': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {
@@ -5710,6 +5745,9 @@ export interface LangPairWithVariables<V = LangVariable> {
   'UMessageChatTrashDaysLeft': {
     '0': V;
   };
+  'UMessageReminderTitle': {
+    '0': V;
+  };
 }
 
 export interface LangPairPlural {
@@ -7944,7 +7982,8 @@ export interface LangKeyGroups {
   };
   '0': {
     keys:
-      | 'UMessageChatTrashDaysLeft';
+      | 'UMessageChatTrashDaysLeft'
+      | 'UMessageReminderTitle';
     variables: '0';
   };
 }

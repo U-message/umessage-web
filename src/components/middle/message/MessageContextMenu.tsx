@@ -1,7 +1,7 @@
 import {
   memo, useEffect, useMemo, useRef,
 } from '../../../lib/teact/teact';
-import { getActions } from '../../../global';
+import { getActions, getGlobal } from '../../../global';
 
 import type {
   ApiAvailableReaction,
@@ -27,9 +27,12 @@ import {
   groupStatefulContent,
 } from '../../../global/helpers';
 import { getPeerTitle } from '../../../global/helpers/peers';
+import { selectSettingsKeys } from '../../../global/selectors';
 import buildClassName from '../../../util/buildClassName';
 import { isUserId } from '../../../util/entities/ids';
+import { formatDateTime } from '../../../util/localization/dateFormat';
 import { disableScrolling } from '../../../util/scrollLock';
+import { getEditHistory } from '../../../util/umessageHistory';
 import { REM } from '../../common/helpers/mediaDimensions';
 import renderText from '../../common/helpers/renderText';
 import { getMessageCopyOptions } from './helpers/copyOptions';
@@ -265,9 +268,22 @@ const MessageContextMenu = ({
 }: OwnProps) => {
   const {
     showNotification, openStickerSet, openCustomEmojiSets, loadStickers, openGiftModal,
-    openWalletTransferLink,
+    openWalletTransferLink, showDialog,
   } = getActions();
   const menuRef = useRef<HTMLDivElement>();
+
+  // U message "Save deleted messages" also keeps earlier versions of edited messages
+  const canShowEditHistory = Boolean(message.isEdited && selectSettingsKeys(getGlobal()).umSaveDeleted);
+  const handleShowEditHistory = useLastCallback(async () => {
+    onClose();
+    const versions = await getEditHistory(getGlobal().currentUserId!, message.chatId, message.id);
+    const text = versions.length
+      ? [...versions, { text: message.content.text?.text || '', date: message.editDate || message.date }]
+        .map((version) => `${formatDateTime(lang, new Date(version.date * 1000))}\n${version.text}`)
+        .join('\n\n')
+      : lang('UMessageEditHistoryEmpty');
+    showDialog({ data: { type: 'message', text: { text } } });
+  });
   const scrollableRef = useRef<HTMLDivElement>();
 
   const lang = useLang();
@@ -489,6 +505,9 @@ const MessageContextMenu = ({
           </MenuItem>
         )}
         {canEdit && <MenuItem icon="edit" onClick={onEdit}>{lang('Edit')}</MenuItem>}
+        {canShowEditHistory && (
+          <MenuItem icon="edit" onClick={handleShowEditHistory}>{lang('UMessageEditHistory')}</MenuItem>
+        )}
         {canAppendTodoList && (
           <MenuItem icon="add" onClick={onAppendTodoList}>
             {lang('MenuButtonAppendTodoList')}

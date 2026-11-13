@@ -7,7 +7,9 @@ import type {
 import type { GlobalState } from '../global/types';
 import { ApiMediaFormat } from '../api/types';
 
-import { APP_NAME, DEBUG, IS_TEST } from '../config';
+import {
+  ALL_FOLDER_ID, APP_NAME, DEBUG, IS_TEST,
+} from '../config';
 import {
   getChatAvatarHash,
   getChatTitle,
@@ -26,6 +28,7 @@ import {
   selectCurrentMessageList,
   selectCustomEmoji,
   selectIsChatWithSelf,
+  selectIsUMessageFocusActiveNow,
   selectIsUMessageHiddenFromList,
   selectNotifyDefaults,
   selectNotifyException,
@@ -38,6 +41,7 @@ import { callApi } from '../api/gramjs';
 import { IS_TAURI } from './browser/globalEnvironment';
 import { IS_SERVICE_WORKER_SUPPORTED, IS_TOUCH_ENV } from './browser/windowEnvironment';
 import jsxToHtml from './element/jsxToHtml';
+import { getChatFolderIds } from './folderManager';
 import { buildCollectionByKey } from './iteratees';
 import { getTranslationFn } from './localization';
 import * as mediaLoader from './mediaLoader';
@@ -320,6 +324,12 @@ function checkIfShouldNotify(chat: ApiChat, message: Partial<ApiMessage>) {
     || selectIsUMessageHiddenFromList(global, chat.id)) {
     return false;
   }
+  // U message focus mode: outside the allowed folders only mentions and replies to you come through
+  if (selectIsUMessageFocusActiveNow(global) && !message.hasUnreadMention && !message.isMentioned) {
+    const allowedFolderIds = selectSettingsKeys(global).umFocusFolderIds || [];
+    const chatFolderIds = getChatFolderIds(chat.id) || [];
+    if (!allowedFolderIds.some((id) => id === ALL_FOLDER_ID || chatFolderIds.includes(id))) return false;
+  }
   // On touch devices show notifications when chat is not active
   if (IS_TOUCH_ENV) {
     const {
@@ -530,6 +540,41 @@ export async function notifyAboutMessage({
       playNotifySoundDebounced(String(message.id) || chat.id);
     };
   }
+}
+
+// U message "Unread message reminder": the chat's normal content and privacy rules, a reminder title
+export async function notifyUMessageReminder({
+  chat, message, isSilent,
+}: { chat: ApiChat; message: ApiMessage; isSilent?: boolean }) {
+  const global = getGlobal();
+  if (!selectSettingsKeys(global).hasWebNotifications || !checkIfNotificationsSupported()) return;
+
+  const lang = getTranslationFn();
+  const { body } = getNotificationContent(chat, message);
+  const title = global.passcode.isScreenLocked
+    ? lang('UMessageReminder')
+    : lang('UMessageReminderTitle', { 0: getChatTitle(lang, chat, chat.id === global.currentUserId) });
+  const icon = await getAvatar(chat);
+
+  if (checkIfPushSupported()) {
+    navigator.serviceWorker?.controller?.postMessage({
+      type: 'showMessageNotification',
+      payload: {
+        title, body, icon, chatId: chat.id, messageId: message.id, shouldReplaceHistory: true, isSilent,
+      },
+    });
+    return;
+  }
+
+  const notification = new Notification(title, { body, icon, badge: icon, tag: `reminder_${chat.id}` });
+  notification.onclick = () => {
+    notification.close();
+    getActions().focusMessage({ chatId: chat.id, messageId: message.id, shouldReplaceHistory: true });
+    window.focus?.();
+  };
+  notification.onshow = () => {
+    if (!isSilent && !IS_TAURI) playNotifySoundDebounced(`reminder_${chat.id}`);
+  };
 }
 
 export function closeMessageNotifications(payload: { chatId: string; lastReadInboxMessageId?: number }) {

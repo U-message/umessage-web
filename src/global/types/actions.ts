@@ -230,6 +230,7 @@ export interface ActionPayloads {
   restoreUMessageChat: { chatId: string };
   purgeUMessageTrash: { chatIds?: string[]; isAll?: boolean } | undefined;
   processUMessageIncoming: { chatId: string; message: ApiMessage };
+  setUMessageAdminFolders: { isEnabled: boolean };
   setSharedSettingOption: Partial<SharedState['settings']> | undefined;
   updatePerformanceSettings: Partial<PerformanceType>;
   loadPasswordInfo: undefined;

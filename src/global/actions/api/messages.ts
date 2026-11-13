@@ -68,6 +68,7 @@ import { getTranslationFn, type RegularLangFnParameters } from '../../../util/lo
 import { formatStarsAsText } from '../../../util/localization/format';
 import { debounce, onTickEnd, rafPromise } from '../../../util/schedulers';
 import { getServerTime } from '../../../util/serverTime';
+import { markOwnDeletion } from '../../../util/umessageHistory';
 import { callApi, cancelApiProgress } from '../../../api/gramjs';
 import {
   getIsSavedDialog,
@@ -1306,6 +1307,7 @@ addActionHandler('deleteMessages', (global, actions, payload): ActionReturnType 
     return;
   }
 
+  markOwnDeletion(chatId, messageIdsToDelete);
   void callApi('deleteMessages', { chat, messageIds: messageIdsToDelete, shouldDeleteForAll });
 
   const editingId = selectEditingId(global, chatId, threadId);
