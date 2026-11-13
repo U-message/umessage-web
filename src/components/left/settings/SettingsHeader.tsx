@@ -174,6 +174,10 @@ const SettingsHeader = ({
         return <h3>{lang('Stickers')}</h3>;
       case SettingsScreens.Experimental:
         return <h3>{lang('SettingsExperimental')}</h3>;
+      case SettingsScreens.UMessage:
+        return <h3>{lang('AppName')}</h3>;
+      case SettingsScreens.UMessageGhostUsers:
+        return <h3>{lang('UMessageGhostUsers')}</h3>;
 
       case SettingsScreens.GeneralChatBackground:
         return <h3>{lang('ChatBackground')}</h3>;

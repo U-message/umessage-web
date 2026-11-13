@@ -55,15 +55,16 @@ export const RESET_WALLPAPER_SETTINGS: Partial<IThemeSettings> = {
 // Dark default chat wallpaper rendered through the same gradient engine as any picked wallpaper
 // Negative intensity => the pattern masks the gradient (doodles reveal the animated gradient over
 // a dark base), matching Telegram's dark-wallpaper convention.
+// U message keeps the default wallpapers monochrome, like the rest of the ink theme
 export const DEFAULT_DARK_WALLPAPER: DefaultWallpaper = {
-  colors: ['#4f5bd5', '#962fbf', '#dd6cb9', '#fec496'],
-  patternColor: getWallpaperPatternColor('#4f5bd5'),
+  colors: ['#3a3a3d', '#5c5c61', '#2d2d30', '#48484c'],
+  patternColor: getWallpaperPatternColor('#3a3a3d'),
   intensity: -DEFAULT_PATTERN_INTENSITY,
 };
 
 export const DEFAULT_LIGHT_WALLPAPER: DefaultWallpaper = {
-  colors: ['#bdcd8c', '#8eba89', '#83b28f', '#c5d3b0'],
-  patternColor: getWallpaperPatternColor('#bdcd8c'),
+  colors: ['#e5e5ea', '#d8d8de', '#ededf0', '#ccccd3'],
+  patternColor: getWallpaperPatternColor('#d8d8de'),
   intensity: DEFAULT_PATTERN_INTENSITY,
 };
 

@@ -33,6 +33,7 @@ import {
 import { updateTabState } from '../../reducers/tabs';
 import {
   selectChat, selectIsCurrentUserFrozen,
+  selectIsUMessageGhostOnline,
   selectLanguageCode,
   selectTabState, selectUser,
 } from '../../selectors';
@@ -691,7 +692,8 @@ addActionHandler('setPrivacySettings', async (global, actions, payload): Promise
 
 addActionHandler('updateIsOnline', (global, actions, payload): ActionReturnType => {
   if (global.connectionState !== 'connectionStateReady') return;
-  callApi('updateIsOnline', payload.isOnline);
+  // Ghost mode for everyone keeps reporting offline
+  callApi('updateIsOnline', payload.isOnline && !selectIsUMessageGhostOnline(global));
 });
 
 addActionHandler('loadContentSettings', async (global): Promise<void> => {

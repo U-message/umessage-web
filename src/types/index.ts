@@ -29,6 +29,7 @@ import type {
   ApiPageBlockVideo,
   ApiPeer,
   ApiPhoto,
+  ApiPrivacySettings,
   ApiReaction,
   ApiReactionWithPaid,
   ApiRichMessage,
@@ -192,7 +193,19 @@ export interface AccountSettings {
   doNotTranslate: string[];
   translationTone?: TranslationTone;
   shouldPaidMessageAutoApprove: boolean;
+  // U message, mirrors the Android app's settings of the same names
+  umGhostMode?: boolean;
+  umGhostScope?: UMessageGhostScope;
+  umGhostUserIds?: string[];
+  // The user's own "Last seen & online" rule, kept while a ghost scope list overrides it
+  umGhostPrivacyBackup?: ApiPrivacySettings;
+  umBlockAds?: boolean;
+  umConfirmSticker?: boolean;
+  umConfirmVoice?: boolean;
+  umConfirmGif?: boolean;
 }
+
+export type UMessageGhostScope = 'all' | 'only' | 'except';
 
 export type IAnchorPosition = {
   x: number;
@@ -311,6 +324,8 @@ export enum SettingsScreens {
   DoNotTranslate,
   FoldersShare,
   Passkeys,
+  UMessage,
+  UMessageGhostUsers,
 }
 
 export type StickerSetOrReactionsSetOrRecent = Pick<ApiStickerSet, (

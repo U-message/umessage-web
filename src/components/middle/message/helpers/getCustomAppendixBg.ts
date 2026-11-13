@@ -4,11 +4,11 @@ import { MAX_WORKERS, requestMediaWorker } from '../../../../util/launchMediaWor
 
 const SELECTED_APPENDIX_COLORS = {
   dark: {
-    outgoing: 'rgb(135,116,225)',
+    outgoing: 'rgb(58,58,61)',
     incoming: 'rgb(33,33,33)',
   },
   light: {
-    outgoing: 'rgb(238,255,222)',
+    outgoing: 'rgb(216,216,222)',
     incoming: 'rgb(255,255,255)',
   },
 };

@@ -158,6 +158,7 @@ import {
   selectIsCurrentUserFrozen,
   selectIsCurrentUserPremium,
   selectIsMonoforumAdmin,
+  selectIsUMessageGhostFor,
   selectLanguageCode,
   selectListedIds,
   selectMessageIdsByGroupId,
@@ -172,6 +173,7 @@ import {
   selectReplyCanBeSentToChat,
   selectScheduledMessage,
   selectSendAs,
+  selectShouldUMessageBlockAds,
   selectStoppableTypingDraftId,
   selectTabState,
   selectTranslationLanguage,
@@ -1635,6 +1637,7 @@ addActionHandler('sendMessageAction', async (global, actions, payload): Promise<
   if (!chat || chat.isMonoforum) return;
   const user = selectUser(global, chatId);
   if (user && (isUserBot(user) || isDeletedUser(user))) return;
+  if (selectIsUMessageGhostFor(global, chatId)) return;
 
   await callApi('sendMessageAction', {
     peer: chat, threadId, action,
@@ -1668,11 +1671,14 @@ addActionHandler('markMessageListRead', (global, actions, payload): ActionReturn
     return undefined;
   }
 
-  runDebouncedForMarkRead(() => {
-    void callApi('markMessageListRead', {
-      chat, threadId, maxId,
+  // Ghost mode: the chat reads as read here, but the sender gets no read receipt
+  if (!selectIsUMessageGhostFor(global, chatId)) {
+    runDebouncedForMarkRead(() => {
+      void callApi('markMessageListRead', {
+        chat, threadId, maxId,
+      });
     });
-  });
+  }
 
   if (chatId === SERVICE_NOTIFICATIONS_USER_ID) {
     global = {
@@ -1710,7 +1716,7 @@ const pendingMediaReadIdsByChat = new Map<string, Set<number>>();
 addActionHandler('markMessagesRead', async (global, actions, payload): Promise<void> => {
   const { chatId, messageIds } = payload;
   const chat = selectChat(global, chatId);
-  if (!chat) {
+  if (!chat || selectIsUMessageGhostFor(global, chatId)) {
     return;
   }
 
@@ -2752,6 +2758,7 @@ addActionHandler('loadSponsoredMessages', async (global, actions, payload): Prom
   if (isApiPeerUser(peer) && selectIsChatBotNotStarted(global, peer.id)) {
     return;
   }
+  if (selectShouldUMessageBlockAds(global)) return;
 
   const result = await callApi('fetchSponsoredMessages', { peer });
   if (!result) {

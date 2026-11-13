@@ -125,6 +125,7 @@ import type {
   ThemeKey,
   ThreadId,
   TranslationTone,
+  UMessageGhostScope,
   WebPageMediaSize,
 } from '../../types';
 import type { BrowserModalStateType, BrowserTab } from '../../types/browser';
@@ -220,6 +221,9 @@ export interface ActionPayloads {
 
   // settings
   setSettingOption: Partial<AccountSettings> | undefined;
+  setUMessageGhostMode: { isEnabled: boolean };
+  setUMessageGhostScope: { scope: UMessageGhostScope };
+  setUMessageGhostUsers: { userIds: string[] };
   setSharedSettingOption: Partial<SharedState['settings']> | undefined;
   updatePerformanceSettings: Partial<PerformanceType>;
   loadPasswordInfo: undefined;

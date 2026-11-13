@@ -45,6 +45,8 @@ import SettingsPrivacyVisibility from './SettingsPrivacyVisibility';
 import SettingsPrivacyVisibilityExceptionList from './SettingsPrivacyVisibilityExceptionList';
 import SettingsQuickReaction from './SettingsQuickReaction';
 import SettingsStickers from './SettingsStickers';
+import SettingsUMessage from './SettingsUMessage';
+import SettingsUMessageGhostUsers from './SettingsUMessageGhostUsers';
 import SettingsTwoFa from './twoFa/SettingsTwoFa';
 
 import './Settings.scss';
@@ -370,6 +372,17 @@ const Settings = ({
       case SettingsScreens.Experimental:
         return (
           <SettingsExperimental isActive={isScreenActive} onReset={handleReset} />
+        );
+      case SettingsScreens.UMessage:
+        return (
+          <SettingsUMessage
+            isActive={isScreenActive || activeScreen === SettingsScreens.UMessageGhostUsers}
+            onReset={handleReset}
+          />
+        );
+      case SettingsScreens.UMessageGhostUsers:
+        return (
+          <SettingsUMessageGhostUsers isActive={isScreenActive} onReset={handleReset} />
         );
       case SettingsScreens.GeneralChatBackground:
         return (

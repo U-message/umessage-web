@@ -125,6 +125,7 @@ import {
   selectIsChatPinned,
   selectIsChatWithSelf,
   selectIsCurrentUserFrozen,
+  selectIsUMessageGhostFor,
   selectLastServiceNotification,
   selectPeer,
   selectPeerFullInfo,
@@ -1533,7 +1534,9 @@ addActionHandler('markChatMessagesRead', async (global, actions, payload): Promi
   if (!chat) return;
 
   if (!chat.isForum) {
-    await callApi('markMessageListRead', { chat, threadId: MAIN_THREAD_ID });
+    if (!selectIsUMessageGhostFor(global, id)) {
+      await callApi('markMessageListRead', { chat, threadId: MAIN_THREAD_ID });
+    }
     actions.readAllMentions({ chatId: id });
     actions.readAllReactions({ chatId: id });
     actions.readAllPollVotes({ chatId: id });
@@ -1617,11 +1620,13 @@ addActionHandler('markTopicRead', (global, actions, payload): ActionReturnType =
   const lastTopicMessageId = lastTopicThreadInfo?.lastMessageId;
   if (!lastTopicMessageId) return;
 
-  void callApi('markMessageListRead', {
-    chat,
-    threadId: topicId,
-    maxId: lastTopicMessageId,
-  });
+  if (!selectIsUMessageGhostFor(global, chatId)) {
+    void callApi('markMessageListRead', {
+      chat,
+      threadId: topicId,
+      maxId: lastTopicMessageId,
+    });
+  }
   actions.readAllMentions({ chatId, threadId: topicId });
   actions.readAllReactions({ chatId, threadId: topicId });
   actions.readAllPollVotes({ chatId, threadId: topicId });

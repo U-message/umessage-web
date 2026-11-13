@@ -101,6 +101,20 @@ const SettingsMain = ({
       <div className={styles.menuSection}>
         <Island>
           <ListItem
+            icon="eye-crossed"
+            iconBg="gray"
+            multiline
+            narrow
+            onClick={() => openSettingsScreen({ screen: SettingsScreens.UMessage })}
+          >
+            <span className="title">{lang('AppName')}</span>
+            <span className="subtitle">{lang('UMessageGhostModeInfo')}</span>
+          </ListItem>
+        </Island>
+      </div>
+      <div className={styles.menuSection}>
+        <Island>
+          <ListItem
             icon="account-filled"
             iconBg="blue"
             multiline

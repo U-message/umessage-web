@@ -39,3 +39,31 @@
 .theme-dark #auth-registration-form {
   background: #000000;
 }
+
+// Spinners drawn in the accent colour follow the ink theme
+:root {
+  --spinner-blue-data: var(--spinner-black-data);
+  --spinner-dark-blue-data: var(--spinner-white-data);
+}
+
+// Components forced into dark (story viewer, attachments over stories) use the same greys as the dark theme.
+// index.scss declares its own .component-theme-dark after this module, hence the extra specificity.
+:root .component-theme-dark {
+  --color-background-own: #2D2D30;
+  --color-background-own-apple: #2D2D30;
+  --color-background-own-selected: #3A3A3D;
+  --color-chat-active: #2D2D30;
+  --color-chat-active-greyed: #3A3A3D;
+  --color-links: #F5F5F7;
+  --color-active: #EDEDED;
+  --color-text-meta-colored: #EDEDED;
+  --color-reply-own-hover: #3A3A3D;
+  --color-reply-own-hover-apple: #3A3A3D;
+  --color-reply-own-active: #454548;
+  --color-reply-own-active-apple: #454548;
+  --color-code: #E5E5EA;
+  --color-message-reaction-own: #3A3A3D;
+  --color-message-reaction-hover-own: #454548;
+  --color-message-reaction-chosen-hover: #D4D4D6;
+  --color-voice-transcribe-button-own: #3A3A3D;
+}

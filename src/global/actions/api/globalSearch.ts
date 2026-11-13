@@ -25,7 +25,8 @@ import {
   updateTopicWithState,
 } from '../../reducers';
 import {
-  selectChat, selectChatByUsername, selectChatMessage, selectCurrentGlobalSearchQuery, selectPeer, selectTabState,
+  selectChat, selectChatByUsername, selectChatMessage, selectCurrentGlobalSearchQuery, selectPeer,
+  selectShouldUMessageBlockAds, selectTabState,
 } from '../../selectors';
 import { selectPlaybackSource } from '../../selectors/audioPlayer';
 
@@ -39,7 +40,7 @@ addActionHandler('setGlobalSearchQuery', (global, actions, payload): ActionRetur
     void searchThrottled(async () => {
       const [searchResult, sponsoredResult] = await Promise.all([
         callApi('searchChats', { query }),
-        callApi('fetchSponsoredPeer', { query }),
+        selectShouldUMessageBlockAds(global) ? undefined : callApi('fetchSponsoredPeer', { query }),
       ]);
 
       global = getGlobal();

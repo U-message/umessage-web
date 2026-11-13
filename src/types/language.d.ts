@@ -3376,6 +3376,32 @@ export interface LangPair {
   'SettingsKeywordsLastSeen': undefined;
   'SettingsKeywordsLogOut': undefined;
   'SettingsSearchEmpty': undefined;
+  'AppName': undefined;
+  'UMessageSectionPrivacy': undefined;
+  'UMessageSectionGeneral': undefined;
+  'UMessageSectionConfirm': undefined;
+  'UMessageGhostMode': undefined;
+  'UMessageGhostModeInfo': undefined;
+  'UMessageGhostModeOn': undefined;
+  'UMessageGhostModeOff': undefined;
+  'UMessageGhostScope': undefined;
+  'UMessageGhostScopeAll': undefined;
+  'UMessageGhostScopeOnly': undefined;
+  'UMessageGhostScopeExcept': undefined;
+  'UMessageGhostUsers': undefined;
+  'UMessageGhostUsersAdd': undefined;
+  'UMessageBlockAds': undefined;
+  'UMessageBlockAdsInfo': undefined;
+  'UMessageConfirmTitle': undefined;
+  'UMessageConfirmSticker': undefined;
+  'UMessageConfirmStickerInfo': undefined;
+  'UMessageConfirmStickerAsk': undefined;
+  'UMessageConfirmVoice': undefined;
+  'UMessageConfirmVoiceInfo': undefined;
+  'UMessageConfirmVoiceAsk': undefined;
+  'UMessageConfirmGif': undefined;
+  'UMessageConfirmGifInfo': undefined;
+  'UMessageConfirmGifAsk': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {

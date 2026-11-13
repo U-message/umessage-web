@@ -215,6 +215,7 @@ import WebPagePreview from '../middle/composer/WebPagePreview';
 import MessageEffect from '../middle/message/MessageEffect';
 import ReactionSelector from '../middle/message/reactions/ReactionSelector';
 import Button from '../ui/Button';
+import ConfirmDialog from '../ui/ConfirmDialog';
 import MediaEditor from '../ui/mediaEditor/MediaEditor.async';
 import ResponsiveHoverButton from '../ui/ResponsiveHoverButton';
 import Spinner from '../ui/Spinner';
@@ -314,6 +315,9 @@ type StateProps = {
   attachmentSettings: GlobalState['attachmentSettings'];
   slowMode?: ApiChatFullInfo['slowMode'];
   shouldUpdateStickerSetOrder?: boolean;
+  shouldConfirmSticker?: boolean;
+  shouldConfirmVoice?: boolean;
+  shouldConfirmGif?: boolean;
   availableReactions?: ApiAvailableReaction[];
   topReactions?: ApiReaction[];
   canPlayAnimatedEmojis?: boolean;
@@ -456,6 +460,9 @@ const Composer = ({
   theme,
   slowMode,
   shouldUpdateStickerSetOrder,
+  shouldConfirmSticker,
+  shouldConfirmVoice,
+  shouldConfirmGif,
   editableInputCssSelector,
   editableInputId,
   inputId,
@@ -542,6 +549,19 @@ const Composer = ({
   } = getActions();
 
   const lang = useLang();
+
+  // U message: "Confirmation dialogs" settings ask before a sticker, GIF or voice message goes out
+  const [pendingUMessageSend, setPendingUMessageSend] = useState<
+    { askKey: RegularLangKey; send: NoneToVoidFunction } | undefined
+  >();
+  const handleConfirmUMessageSend = useLastCallback(() => {
+    const pending = pendingUMessageSend;
+    setPendingUMessageSend(undefined);
+    pending?.send();
+  });
+  const handleCancelUMessageSend = useLastCallback(() => {
+    setPendingUMessageSend(undefined);
+  });
   const isEditingMedia = Boolean(editingMessage && hasMessageMedia(editingMessage));
 
   const inputRef = useRef<HTMLDivElement>();
@@ -1672,6 +1692,17 @@ const Composer = ({
           blob,
           { voice: { duration, waveform }, ttlSeconds },
         )];
+
+        if (shouldConfirmVoice) {
+          const voiceAttachments = currentAttachments;
+          setPendingUMessageSend({
+            askKey: 'UMessageConfirmVoiceAsk',
+            send: () => handleSendCore(
+              voiceAttachments, isSilent, scheduledAt, scheduleRepeatPeriod, shouldSkipWebPagePreview,
+            ),
+          });
+          return;
+        }
       }
     }
 
@@ -1911,6 +1942,17 @@ const Composer = ({
   });
 
   const handleGifSelect = useLastCallback((gif: ApiVideo, isSilent?: boolean, isScheduleRequested?: boolean) => {
+    if (shouldConfirmGif) {
+      setPendingUMessageSend({
+        askKey: 'UMessageConfirmGifAsk',
+        send: () => sendGif(gif, isSilent, isScheduleRequested),
+      });
+      return;
+    }
+    sendGif(gif, isSilent, isScheduleRequested);
+  });
+
+  const sendGif = useLastCallback((gif: ApiVideo, isSilent?: boolean, isScheduleRequested?: boolean) => {
     if (!validateEphemeralReply() || (isEphemeralReply && isScheduleRequested)) return;
 
     if (!currentMessageList && !storyId) {
@@ -1950,6 +1992,23 @@ const Composer = ({
   });
 
   const handleStickerSelect = useLastCallback((
+    sticker: ApiSticker,
+    isSilent?: boolean,
+    isScheduleRequested?: boolean,
+    shouldPreserveInput = false,
+    canUpdateStickerSetsOrder?: boolean,
+  ) => {
+    if (shouldConfirmSticker) {
+      setPendingUMessageSend({
+        askKey: 'UMessageConfirmStickerAsk',
+        send: () => sendSticker(sticker, isSilent, isScheduleRequested, shouldPreserveInput, canUpdateStickerSetsOrder),
+      });
+      return;
+    }
+    sendSticker(sticker, isSilent, isScheduleRequested, shouldPreserveInput, canUpdateStickerSetsOrder);
+  });
+
+  const sendSticker = useLastCallback((
     sticker: ApiSticker,
     isSilent?: boolean,
     isScheduleRequested?: boolean,
@@ -3331,6 +3390,14 @@ const Composer = ({
         setAutoApprove={setShouldPaidMessageAutoApprove}
         confirmHandler={paymentMessageConfirmDialogHandler}
       />
+      <ConfirmDialog
+        isOpen={Boolean(pendingUMessageSend)}
+        title={lang('UMessageConfirmTitle')}
+        text={pendingUMessageSend ? lang(pendingUMessageSend.askKey) : undefined}
+        confirmLabel={lang('Send')}
+        confirmHandler={handleConfirmUMessageSend}
+        onClose={handleCancelUMessageSend}
+      />
       {isInMessageList && (
         <RemoveFormattingModal
           isOpen={isRemoveFormattingModalOpen}
@@ -3361,7 +3428,7 @@ export default memo(withGlobal<OwnProps>(
       && selectNewestMessageWithBotKeyboardButtons(global, chatId, threadId);
     const {
       shouldSuggestStickers, shouldSuggestCustomEmoji, shouldUpdateStickerSetOrder, shouldPaidMessageAutoApprove,
-      lastRecordMessageMode,
+      lastRecordMessageMode, umConfirmSticker, umConfirmVoice, umConfirmGif,
     } = global.settings.byKey;
     const { shouldCollectDebugLogs } = selectSharedSettings(global);
     const language = selectLanguageCode(global);
@@ -3487,6 +3554,9 @@ export default memo(withGlobal<OwnProps>(
       shouldSuggestStickers,
       shouldSuggestCustomEmoji,
       shouldUpdateStickerSetOrder,
+      shouldConfirmSticker: umConfirmSticker,
+      shouldConfirmVoice: umConfirmVoice,
+      shouldConfirmGif: umConfirmGif,
       recentEmojis: global.recentEmojis,
       baseEmojiKeywords: baseEmojiKeywords?.keywords,
       emojiKeywords: emojiKeywords?.keywords,

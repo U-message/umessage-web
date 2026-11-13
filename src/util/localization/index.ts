@@ -39,6 +39,7 @@ import { replaceInStringsWithTeact } from '../replaceWithTeact';
 import { fastRaf } from '../schedulers';
 import { resetDateFormatCache } from './dateFormat';
 import rebrandString from './rebrand';
+import { getUMessageString } from './umessageStrings';
 
 import Deferred from '../Deferred';
 import LimitedMap from '../primitives/LimitedMap';
@@ -489,6 +490,7 @@ function getString(langKey: LangKey, count: number) {
   if (langPackStringValue && isDeletedLangString(langPackStringValue)) langPackStringValue = undefined;
   langPackStringValue ??= !shouldForceFallback ? baseLangPack?.strings[langKey] : undefined;
   if (langPackStringValue && isDeletedLangString(langPackStringValue)) langPackStringValue = undefined;
+  langPackStringValue ??= getUMessageString(language?.langCode, langKey);
   const shouldUseFallback = langPackStringValue === undefined;
 
   if (shouldUseFallback && !fallbackLangPack) {
