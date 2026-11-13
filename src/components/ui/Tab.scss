@@ -83,6 +83,7 @@
   }
 
   &__badge--active {
+    color: var(--color-on-primary, #fff);
     background: var(--color-primary) !important;
   }
 

@@ -153,7 +153,7 @@
   height: 2.875rem;
   border-radius: 0.625rem;
 
-  color: var(--color-white);
+  color: var(--color-on-primary, #fff);
 
   background-color: var(--color-primary);
 }

@@ -114,3 +114,14 @@ html.theme-dark {
 :root {
   --messages-container-width: 100%;
 }
+
+// Ink drawn on the accent: white on the black accent of the light theme, black on the near-white accent of the dark
+// theme. Components that put text, badges or check marks on --color-primary use it instead of a fixed white.
+:root {
+  --color-on-primary: #ffffff;
+}
+
+html.theme-dark {
+  --color-on-primary: #000000;
+  --ui-check-color: #000000;
+}

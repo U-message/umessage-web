@@ -90,11 +90,11 @@
   }
 
   &_active {
-    color: var(--color-white);
+    color: var(--color-on-primary, #fff);
     background: var(--color-primary) !important;
   }
 
-  :global(.theme-dark) & {
+  :global(.theme-dark) &:not(.tipsItem_active) {
     color: var(--color-white);
   }
 }

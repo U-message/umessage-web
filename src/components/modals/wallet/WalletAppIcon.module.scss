@@ -36,7 +36,7 @@
   border-radius: 50%;
 
   font-size: 2rem;
-  color: var(--color-white);
+  color: var(--color-on-primary, #fff);
 
   background: var(--color-primary);
 }

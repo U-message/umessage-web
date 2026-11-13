@@ -22,7 +22,7 @@
   height: 2.25rem;
   border-radius: 50%;
 
-  color: var(--color-white);
+  color: var(--color-on-primary, #fff);
 
   background-color: var(--color-primary);
 }

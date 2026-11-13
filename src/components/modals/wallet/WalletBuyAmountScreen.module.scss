@@ -44,7 +44,7 @@
 }
 
 .chipActive {
-  color: var(--color-white);
+  color: var(--color-on-primary, #fff);
   background-color: var(--color-primary);
 }
 

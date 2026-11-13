@@ -19,7 +19,7 @@
     border-radius: 50%;
 
     font-size: 3rem;
-    color: white;
+    color: var(--color-on-primary, #fff);
 
     background-color: var(--color-primary);
     outline: none !important;

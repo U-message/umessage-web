@@ -169,7 +169,7 @@
 
     font-size: 1.125rem;
     line-height: 1;
-    color: var(--color-white);
+    color: var(--color-on-primary, #fff);
 
     transition: background-color 0.15s, border-color 0.15s;
 
@@ -196,7 +196,7 @@
     font-size: 0.625rem;
     font-weight: var(--font-weight-semibold);
     line-height: 0.625rem;
-    color: var(--color-white);
+    color: var(--color-on-primary, #fff);
 
     background-color: var(--color-primary);
   }

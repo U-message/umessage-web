@@ -200,7 +200,7 @@
   height: var(--composer-main-button-height);
   border-radius: var(--composer-control-radius);
 
-  color: white;
+  color: var(--color-on-primary, #fff);
 
   background: var(--color-primary);
 }

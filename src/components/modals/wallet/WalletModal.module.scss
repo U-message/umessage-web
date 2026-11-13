@@ -39,7 +39,7 @@
 .headerOnAccent {
   --color-primary: var(--color-telegram-blue);
 
-  color: var(--color-white);
+  color: var(--color-on-primary, #fff);
   background-color: var(--color-primary);
 
   .headerButton :global(.animated-close-icon) {

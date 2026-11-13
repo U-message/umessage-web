@@ -87,7 +87,7 @@
 
   &:hover {
     border-color: var(--color-primary-shade);
-    color: #fff;
+    color: var(--color-on-primary, #fff);
     background: var(--color-primary-shade);
   }
 }
@@ -120,6 +120,8 @@
 
 .primaryTint {
   --secondary-bg: var(--color-primary);
+
+  color: var(--color-on-primary, #fff);
 }
 
 .successTint {

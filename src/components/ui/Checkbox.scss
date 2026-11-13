@@ -152,7 +152,7 @@
       position: absolute;
 
       font-size: 1.25rem;
-      color: var(--color-white);
+      color: var(--color-on-primary, #fff);
 
       opacity: 0;
 

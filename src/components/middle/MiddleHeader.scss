@@ -75,6 +75,7 @@
       background: var(--color-gray);
 
       &.active {
+        color: var(--color-on-primary, #fff);
         background: var(--color-primary);
       }
     }
@@ -316,7 +317,7 @@
       font-size: 0.75rem;
       font-weight: var(--font-weight-medium);
       line-height: 1rem;
-      color: white;
+      color: var(--color-on-primary, #fff);
       text-align: center;
 
       background: var(--color-primary);

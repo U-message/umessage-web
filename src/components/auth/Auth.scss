@@ -217,7 +217,7 @@
         border-radius: 50%;
 
         font-size: 0.875rem;
-        color: white;
+        color: var(--color-on-primary, #fff);
 
         background: var(--color-primary);
       }

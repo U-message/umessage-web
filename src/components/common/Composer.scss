@@ -428,7 +428,7 @@
     .bot-commands {
       width: var(--composer-main-button-height);
       height: var(--composer-main-button-height);
-      color: white !important;
+      color: var(--color-on-primary, #fff) !important;
       background: var(--color-primary) !important;
 
       &.activated {
@@ -813,7 +813,7 @@
       padding: 0 var(--padding-sides);
       border-radius: calc(var(--height) / 2);
 
-      color: white !important;
+      color: var(--color-on-primary, #fff) !important;
       text-transform: none;
 
       background: var(--color-primary) !important;

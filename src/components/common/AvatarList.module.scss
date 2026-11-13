@@ -40,7 +40,7 @@
   font-size: 0.75rem;
   font-weight: var(--font-weight-medium);
   line-height: 1rem;
-  color: var(--color-white);
+  color: var(--color-on-primary, #fff);
 
   background-color: var(--color-primary);
 }

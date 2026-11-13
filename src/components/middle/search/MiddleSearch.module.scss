@@ -268,7 +268,7 @@
 }
 
 .selectedType {
-  color: var(--color-white) !important;
+  color: var(--color-on-primary, #fff) !important;
   background-color: var(--color-primary);
 
   &:hover {
