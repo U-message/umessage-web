@@ -43,6 +43,8 @@ type OwnProps = {
   onClick: (transaction: ApiWalletTransaction) => void;
 };
 
+// The counterparty is Telegram itself, so the app-name rebrand must not apply
+const TELEGRAM_PEER_NAME = 'Telegram';
 const AVATAR_SIZE = 42;
 const EXPAND_DURATION = 520;
 const APPEAR_DURATION = 560;
@@ -236,7 +238,7 @@ function getTitle(lang: LangFn, peer: ApiWalletTransactionPeer, counterparty?: A
         ? 'WalletTransactionTopUpCrypto'
         : 'WalletTransactionTopUp');
     case 'telegramGift':
-      return lang('Telegram');
+      return TELEGRAM_PEER_NAME;
     case 'unsupported':
       return lang('WalletTransactionUnsupportedPeer');
     default:

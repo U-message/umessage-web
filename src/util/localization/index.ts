@@ -38,6 +38,7 @@ import { mapValues, omit, unique } from '../iteratees';
 import { replaceInStringsWithTeact } from '../replaceWithTeact';
 import { fastRaf } from '../schedulers';
 import { resetDateFormatCache } from './dateFormat';
+import rebrandString from './rebrand';
 
 import Deferred from '../Deferred';
 import LimitedMap from '../primitives/LimitedMap';
@@ -505,7 +506,7 @@ function getString(langKey: LangKey, count: number) {
     ? (langPackStringValue[pluralSuffix] ?? langPackStringValue.other)
     : langPackStringValue;
 
-  return string;
+  return rebrandString(string);
 }
 
 function processVariable(value: TeactNode | LangFnParametersShape<LangFnOptions>) {

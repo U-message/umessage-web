@@ -62,6 +62,8 @@ type DomainCellOwnProps = {
   domain: string;
 };
 
+// The counterparty is Telegram itself, so the app-name rebrand must not apply
+const TELEGRAM_PEER_NAME = 'Telegram';
 const DIAMOND_SIZE = 120;
 
 const WalletTransactionScreen = ({
@@ -118,7 +120,7 @@ const WalletTransactionScreen = ({
         rows.push([lang('WalletTransactionDomain'), <DomainCell domain={domain} />]);
       }
     } else if (peer.type === 'telegramGift') {
-      rows.push([peerLabel, lang('Telegram')]);
+      rows.push([peerLabel, TELEGRAM_PEER_NAME]);
     } else if (domain) {
       // The button sends to the address behind the domain, which the form takes without resolving it again
       rows.push([

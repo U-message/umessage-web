@@ -14,6 +14,11 @@
 
     color: #000000;
   }
+
+  // QR login steps: the numbered circles are accent-filled
+  #auth-qr-form ol li::before {
+    color: #000000;
+  }
 }
 
 #auth-qr-form,
