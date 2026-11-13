@@ -18,12 +18,29 @@ let landmarkerPromise: Promise<FaceLandmarker> | undefined;
 let embedderPromise: Promise<LiteRtModel> | undefined;
 let cropCanvas: OffscreenCanvas | HTMLCanvasElement | undefined;
 
+const LOAD_TIMEOUT_MS = 45_000;
+
+function withTimeout<T>(promise: Promise<T>, label: string) {
+  return new Promise<T>((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(`${label} timed out`)), LOAD_TIMEOUT_MS);
+    promise.then(resolve, reject).finally(() => window.clearTimeout(timer));
+  });
+}
+
+// MediaPipe and LiteRT both bootstrap Emscripten through the same global (window.ModuleFactory / Module); loading
+// them at the same time lets one overwrite the other and the load never finishes. Always load them one after another.
+export async function loadModels() {
+  const landmarker = await loadLandmarker();
+  const embedder = await loadEmbedder();
+  return { landmarker, embedder };
+}
+
 export function loadLandmarker() {
   landmarkerPromise ??= (async () => {
     const { FaceLandmarker, FilesetResolver } = await import('@mediapipe/tasks-vision');
     const fileset = await FilesetResolver.forVisionTasks(`${BASE_PATH}/mediapipe-1.2.0`);
-    return FaceLandmarker.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: `${BASE_PATH}/face_landmarker.task`, delegate: 'GPU' },
+    const create = (delegate: 'GPU' | 'CPU') => FaceLandmarker.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: `${BASE_PATH}/face_landmarker.task`, delegate },
       runningMode: 'VIDEO',
       numFaces: MAX_FACES,
       outputFaceBlendshapes: true,
@@ -31,6 +48,9 @@ export function loadLandmarker() {
       minFacePresenceConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
+    // Some GPUs or drivers cannot run the WebGL delegate (or never answer); the CPU one always works, just slower
+    return withTimeout(create('GPU'), 'Face landmarker (GPU)')
+      .catch(() => withTimeout(create('CPU'), 'Face landmarker'));
   })();
   landmarkerPromise.catch(() => {
     landmarkerPromise = undefined;
@@ -41,8 +61,8 @@ export function loadLandmarker() {
 export function loadEmbedder() {
   embedderPromise ??= (async () => {
     const { loadLiteRt, loadAndCompile } = await import('./litert');
-    await loadLiteRt(`${BASE_PATH}/litert-2.6.0/`);
-    return loadAndCompile(`${BASE_PATH}/face_embedding.tflite`, { accelerator: 'wasm' });
+    await withTimeout(loadLiteRt(`${BASE_PATH}/litert-2.6.0/`), 'LiteRT runtime');
+    return withTimeout(loadAndCompile(`${BASE_PATH}/face_embedding.tflite`, { accelerator: 'wasm' }), 'Face embedder');
   })();
   embedderPromise.catch(() => {
     embedderPromise = undefined;

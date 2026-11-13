@@ -1,7 +1,7 @@
 import { closeCamera, getMeanLuma, openCamera } from './camera';
 import { computePose } from './faceGeometry';
 import {
-  cosine, detectFaces, embedFace, loadEmbedder, loadLandmarker, normalize,
+  cosine, detectFaces, embedFace, loadModels, normalize,
 } from './models';
 import { saveOwnerTemplates } from './ownerStore';
 
@@ -115,8 +115,10 @@ export function startEnrollment(
     let embedder;
     onPhase?.('loading');
     try {
-      [landmarker, embedder] = await Promise.all([loadLandmarker(), loadEmbedder()]);
-    } catch {
+      ({ landmarker, embedder } = await loadModels());
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('[PrivacyGuard] models failed to load', err);
       finish(false, 'models');
       return;
     }

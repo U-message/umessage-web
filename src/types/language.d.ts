@@ -3555,6 +3555,11 @@ export interface LangPair {
   'PrivacyGuardEnrollFinish': undefined;
   'PrivacyGuardTryAgain': undefined;
   'PrivacyGuardEnrollStraight': undefined;
+  'UMessagePgCameraNoticeTitle': undefined;
+  'UMessagePgCameraNoticeText': undefined;
+  'UMessagePgTapOrLook': undefined;
+  'UMessagePgTapShowOrLook': undefined;
+  'UMessagePgLookAtCamera': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {

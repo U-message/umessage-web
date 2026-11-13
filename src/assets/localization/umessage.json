@@ -180,7 +180,12 @@
     "PrivacyGuardEnrollPrivacy": "Surat olinmaydi. Qurilmada faqat shifrlangan yuz namunasi saqlanadi.",
     "PrivacyGuardEnrollFinish": "Tayyor",
     "PrivacyGuardTryAgain": "Qayta urinish",
-    "PrivacyGuardEnrollStraight": "Ekranga to‘g‘ri qarang"
+    "PrivacyGuardEnrollStraight": "Ekranga to‘g‘ri qarang",
+    "UMessagePgCameraNoticeTitle": "Kamera yoniq turadi",
+    "UMessagePgCameraNoticeText": "Privacy Guard yoqilgan paytda kamera chirog‘i yonib turishi tabiiy hol: U message kamera orqali harakatni va ekraningizga kim qarayotganini aniqlaydi. Surat yoki video olinmaydi, hech narsa yozib olinmaydi va hech qayerga yuborilmaydi. Barcha ma’lumotlar faqat sizning qurilmangizda qayta ishlanadi va saqlanadi.",
+    "UMessagePgTapOrLook": "Ochish uchun bosing yoki kameraga qarang",
+    "UMessagePgTapShowOrLook": "Ko‘rsatish uchun bosing yoki kameraga qarang",
+    "UMessagePgLookAtCamera": "Ochish uchun kameraga qarang"
   },
   "ru": {
     "AppName": "U message",
@@ -363,7 +368,12 @@
     "PrivacyGuardEnrollPrivacy": "Фото не делаются. На устройстве хранится только зашифрованный шаблон лица.",
     "PrivacyGuardEnrollFinish": "Готово",
     "PrivacyGuardTryAgain": "Попробовать снова",
-    "PrivacyGuardEnrollStraight": "Смотрите прямо на экран"
+    "PrivacyGuardEnrollStraight": "Смотрите прямо на экран",
+    "UMessagePgCameraNoticeTitle": "Камера остаётся включённой",
+    "UMessagePgCameraNoticeText": "Пока Privacy Guard включён, индикатор камеры горит, и это нормально: U message с помощью камеры замечает движение и то, кто смотрит на ваш экран. Фото и видео не делаются, ничего не записывается и никуда не отправляется. Все данные обрабатываются и хранятся только на вашем устройстве.",
+    "UMessagePgTapOrLook": "Нажмите, чтобы открыть, или посмотрите в камеру",
+    "UMessagePgTapShowOrLook": "Нажмите, чтобы показать, или посмотрите в камеру",
+    "UMessagePgLookAtCamera": "Посмотрите в камеру, чтобы открыть"
   },
   "kaa": {
     "AppName": "U message",
@@ -546,6 +556,11 @@
     "PrivacyGuardEnrollPrivacy": "Súwretler alınbaydı. Bul qurılmada tek shifrlanǵan bet úlgisi saqlanadı.",
     "PrivacyGuardEnrollFinish": "Tayar",
     "PrivacyGuardTryAgain": "Qayta urınıw",
-    "PrivacyGuardEnrollStraight": "Ekranǵa tuwrı qarań"
+    "PrivacyGuardEnrollStraight": "Ekranǵa tuwrı qarań",
+    "UMessagePgCameraNoticeTitle": "Kamera jaǵıq turadı",
+    "UMessagePgCameraNoticeText": "Privacy Guard jaǵılǵan waqıtta kamera shıraǵınıń janıp turıwı tábiyiy jaǵday: U message kamera arqalı qozǵalıstı hám ekranıńızǵa kim qarap turǵanın anıqlaydı. Súwret yamasa video alınbaydı, hesh nárse jazıp alınbaydı hám hesh qayaqqa jiberilmeydi. Barlıq maǵlıwmatlar tek sizdiń qurılmańızda qayta islenedi hám saqlanadı.",
+    "UMessagePgTapOrLook": "Ashıw ushın basıń yamasa kameraǵa qarań",
+    "UMessagePgTapShowOrLook": "Kórsetiw ushın basıń yamasa kameraǵa qarań",
+    "UMessagePgLookAtCamera": "Ashıw ushın kameraǵa qarań"
   }
 }

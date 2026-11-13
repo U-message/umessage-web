@@ -4693,4 +4693,9 @@
 "PrivacyGuardEnrollFinish" = "Done";
 "PrivacyGuardTryAgain" = "Try Again";
 "PrivacyGuardEnrollStraight" = "Look straight at the screen";
+"UMessagePgCameraNoticeTitle" = "The camera stays on";
+"UMessagePgCameraNoticeText" = "While Privacy Guard is on, the camera light stays on. This is normal: U message uses the camera to notice movement and who is looking at your screen. No photos or videos are taken, nothing is recorded or sent. All data is processed and stored only on your device.";
+"UMessagePgTapOrLook" = "Tap to unlock or look at the camera";
+"UMessagePgTapShowOrLook" = "Tap to show or look at the camera";
+"UMessagePgLookAtCamera" = "Look at the camera to unlock";
 /* U message: end */;

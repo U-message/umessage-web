@@ -9,7 +9,8 @@
 
 // In the dark theme the accent is near-white, so anything drawn on an accent fill needs dark ink
 .theme-dark {
-  .Button.primary {
+  // Only filled buttons sit on the accent; text buttons (dialog OK and the like) keep the accent as their text colour
+  .Button.primary:not(.text) {
     --button-text-color: #000000;
 
     color: #000000;
@@ -124,4 +125,13 @@ html.theme-dark {
 html.theme-dark {
   --color-on-primary: #000000;
   --ui-check-color: #000000;
+}
+
+// Privacy Guard camera notice: a clearly visible green OK
+.um-camera-notice .confirm-dialog-button {
+  --color-primary: #30d158;
+  --button-text-color: #30d158;
+
+  font-weight: var(--font-weight-semibold);
+  color: #30d158 !important;
 }

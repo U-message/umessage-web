@@ -5,7 +5,7 @@ import { closeCamera, openCamera } from './camera';
 import { computePose } from './faceGeometry';
 import FaceTracker from './faceTracker';
 import {
-  detectFaces, embedFace, getOwnerSimilarity, loadEmbedder, loadLandmarker,
+  detectFaces, embedFace, getOwnerSimilarity, loadModels,
 } from './models';
 import { clearOwnerCache, loadOwnerTemplates } from './ownerStore';
 import GuardStateMachine from './stateMachine';
@@ -30,6 +30,14 @@ let timer: number | undefined;
 const tracker = new FaceTracker();
 const stateMachine = new GuardStateMachine();
 let isEmbedding = false;
+let isSuspended = false;
+
+// Enrollment needs the camera: the guard steps aside meanwhile and the shield restarts it afterwards
+export function setGuardSuspended(value: boolean) {
+  isSuspended = value;
+  if (value) stopGuard();
+  else listeners.runCallbacks({ ...snapshot }); // a fresh object so subscribers re-render and restart
+}
 
 function publish(next: Partial<GuardSnapshot>) {
   const merged = { ...snapshot, ...next };
@@ -60,13 +68,12 @@ export function dismissGuard() {
 }
 
 export async function startGuard() {
-  if (snapshot.status === 'running' || snapshot.status === 'starting') return;
+  if (isSuspended || snapshot.status === 'running' || snapshot.status === 'starting') return;
   const id = ++runId;
   publish({ status: 'starting' });
   try {
-    const [landmarker, embedder, templates] = await Promise.all([
-      loadLandmarker(), loadEmbedder(), loadOwnerTemplates(),
-    ]);
+    const { landmarker, embedder } = await loadModels();
+    const templates = await loadOwnerTemplates();
     if (id !== runId) return;
     if (!templates?.length) throw new Error('No enrolled face');
     video = document.createElement('video');
@@ -110,7 +117,9 @@ export async function startGuard() {
       }
     };
     tick();
-  } catch {
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('[PrivacyGuard] could not start', err);
     if (id === runId) {
       stopGuard();
       publish({ status: 'error' });

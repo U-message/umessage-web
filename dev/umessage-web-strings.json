@@ -1,0 +1,32 @@
+{
+  "UMessagePgCameraNoticeTitle": {
+    "en": "The camera stays on",
+    "uz": "Kamera yoniq turadi",
+    "ru": "Камера остаётся включённой",
+    "kaa": "Kamera jaǵıq turadı"
+  },
+  "UMessagePgCameraNoticeText": {
+    "en": "While Privacy Guard is on, the camera light stays on. This is normal: U message uses the camera to notice movement and who is looking at your screen. No photos or videos are taken, nothing is recorded or sent. All data is processed and stored only on your device.",
+    "uz": "Privacy Guard yoqilgan paytda kamera chirog‘i yonib turishi tabiiy hol: U message kamera orqali harakatni va ekraningizga kim qarayotganini aniqlaydi. Surat yoki video olinmaydi, hech narsa yozib olinmaydi va hech qayerga yuborilmaydi. Barcha ma’lumotlar faqat sizning qurilmangizda qayta ishlanadi va saqlanadi.",
+    "ru": "Пока Privacy Guard включён, индикатор камеры горит, и это нормально: U message с помощью камеры замечает движение и то, кто смотрит на ваш экран. Фото и видео не делаются, ничего не записывается и никуда не отправляется. Все данные обрабатываются и хранятся только на вашем устройстве.",
+    "kaa": "Privacy Guard jaǵılǵan waqıtta kamera shıraǵınıń janıp turıwı tábiyiy jaǵday: U message kamera arqalı qozǵalıstı hám ekranıńızǵa kim qarap turǵanın anıqlaydı. Súwret yamasa video alınbaydı, hesh nárse jazıp alınbaydı hám hesh qayaqqa jiberilmeydi. Barlıq maǵlıwmatlar tek sizdiń qurılmańızda qayta islenedi hám saqlanadı."
+  },
+  "UMessagePgTapOrLook": {
+    "en": "Tap to unlock or look at the camera",
+    "uz": "Ochish uchun bosing yoki kameraga qarang",
+    "ru": "Нажмите, чтобы открыть, или посмотрите в камеру",
+    "kaa": "Ashıw ushın basıń yamasa kameraǵa qarań"
+  },
+  "UMessagePgTapShowOrLook": {
+    "en": "Tap to show or look at the camera",
+    "uz": "Ko‘rsatish uchun bosing yoki kameraga qarang",
+    "ru": "Нажмите, чтобы показать, или посмотрите в камеру",
+    "kaa": "Kórsetiw ushın basıń yamasa kameraǵa qarań"
+  },
+  "UMessagePgLookAtCamera": {
+    "en": "Look at the camera to unlock",
+    "uz": "Ochish uchun kameraga qarang",
+    "ru": "Посмотрите в камеру, чтобы открыть",
+    "kaa": "Ashıw ushın kameraǵa qarań"
+  }
+}

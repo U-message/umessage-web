@@ -16,6 +16,8 @@ RES = Path(sys.argv[1] if len(sys.argv) > 1 else Path.home() / 'Desktop/Telegram
 KEYS_FILE = ROOT / 'dev/umessage-string-keys.txt'
 FALLBACK = ROOT / 'src/assets/localization/fallback.strings'
 OUT = ROOT / 'src/assets/localization/umessage.json'
+# Strings the web needs that the Android app does not have: {key: {en, uz, ru, kaa}}
+WEB_ONLY = ROOT / 'dev/umessage-web-strings.json'
 LOCALES = {'uz': 'values-uz', 'ru': 'values-ru', 'kaa': 'values-b+kaa'}
 # readStrings splits entries on ';', so the markers end with one to stay separate from the first key
 BEGIN, END = '/* U message: begin */;', '/* U message: end */;'
@@ -44,6 +46,12 @@ def main():
     if with_semicolon:
         sys.exit(f'fallback.strings cannot hold ";" in a value: {with_semicolon}')
 
+    web_only = json.loads(WEB_ONLY.read_text('utf8')) if WEB_ONLY.exists() else {}
+    for key, values in web_only.items():
+        if ';' in values['en']:
+            sys.exit(f'fallback.strings cannot hold ";" in a value: {key}')
+        en[key] = values['en']
+    keys = keys + [k for k in web_only if k not in keys]
     lines = [BEGIN] + [f'"{k}" = {json.dumps(en[k], ensure_ascii=False)};' for k in keys] + [END]
     fallback = FALLBACK.read_text('utf8')
     fallback = re.sub(r'/\* U message: begin \*/;?.*?/\* U message: end \*/;?\n?', '', fallback, flags=re.S).rstrip('\n')
@@ -52,6 +60,7 @@ def main():
     out = {}
     for code, folder in LOCALES.items():
         strings = read_xml(folder)
+        strings.update({k: v[code] for k, v in web_only.items() if code in v})
         out[code] = {k: strings[k] for k in keys if k in strings}
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + '\n', 'utf8')
     print(f'{len(keys)} keys; ' + ', '.join(f'{c}: {len(v)}' for c, v in out.items()))
